@@ -1,28 +1,99 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= content_for(:title) || "Openroles" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<html lang="en">
+<head>
+  <!-- Basic Meta Tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Dynamic Title -->
+  <title><%= content_for?(:title) ? "#{yield(:title)} - OpenRoles" : "OpenRoles - Job Board Platform" %></title>
+  
+  <!-- Dynamic Meta Description -->
+  <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : 'Find your dream job or hire top talent with OpenRoles - A comprehensive job board platform connecting employers and job seekers.' %>">
+  
+  <!-- Author -->
+  <meta name="author" content="<%= content_for?(:author) ? yield(:author) : 'OpenRoles Team' %>">
+  
+  <!-- App favicon -->
+  <link rel="shortcut icon" href="/icon.png">
+  
+  <!-- CSRF Token -->
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= request.original_url %>">
+  <meta property="og:title" content="<%= content_for?(:og_title) ? yield(:og_title) : (content_for?(:title) ? yield(:title) : 'OpenRoles - Job Board Platform') %>">
+  <meta property="og:description" content="<%= content_for?(:og_description) ? yield(:og_description) : (content_for?(:meta_description) ? yield(:meta_description) : 'Find your dream job or hire top talent with OpenRoles') %>">
+  <meta property="og:image" content="<%= content_for?(:og_image) ? yield(:og_image) : "#{request.base_url}/icon.png" %>">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="<%= content_for?(:twitter_card_type) ? yield(:twitter_card_type) : 'summary_large_image' %>">
+  <meta property="twitter:url" content="<%= request.original_url %>">
+  <meta property="twitter:title" content="<%= content_for?(:twitter_title) ? yield(:twitter_title) : (content_for?(:og_title) ? yield(:og_title) : 'OpenRoles - Job Board Platform') %>">
+  <meta property="twitter:description" content="<%= content_for?(:twitter_description) ? yield(:twitter_description) : (content_for?(:og_description) ? yield(:og_description) : 'Find your dream job or hire top talent') %>">
+  <meta property="twitter:image" content="<%= content_for?(:twitter_image) ? yield(:twitter_image) : (content_for?(:og_image) ? yield(:og_image) : "#{request.base_url}/icon.png") %>">
+  
+  <%= render 'layouts/header' %>
+  
+  <!-- JavaScript Import Map -->
+  <%= javascript_importmap_tags %>
+  
+  <!-- Additional Head Content -->
+  <%= yield(:head) if content_for?(:head) %>
+</head>
 
-    <%= yield :head %>
+<body data-layout="horizontal">
+  <!-- Preloader -->
+  <div id="preloader">
+    <div id="status">
+      <div class="spinner-chase">
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+      </div>
+    </div>
+  </div>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+  <!-- Begin page -->
+  <div id="layout-wrapper">
+    <!-- Top Navigation Bar -->
+    <%= render "layouts/navbar" %>
+    
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+      <div class="page-content">
+        <div class="container-fluid">
+          <!-- Alerts/Flash Messages -->
+          <%= render "layouts/alerts_display" %>
+          
+          <!-- Main Content -->
+          <%= yield %>
+        </div> <!-- container-fluid -->
+      </div>
+      <!-- End Page-content -->
+      
+      <!-- Footer -->
+      <%= render "layouts/footer" %>
+    </div>
+    <!-- end main content-->
+  </div>
+  <!-- END layout-wrapper -->
+  
+  <!-- Right Sidebar -->
+  <%= render "layouts/right_sidebar" %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-  </head>
-
-  <body>
-    <%= yield %>
-  </body>
+  
+  <!-- Scripts -->
+  <%= render "layouts/scripts" %>
+  
+  <!-- Page-specific Scripts -->
+  <%= yield(:scripts) if content_for?(:scripts) %>
+</body>
 </html>

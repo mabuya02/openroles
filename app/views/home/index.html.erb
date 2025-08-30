@@ -1,0 +1,151 @@
+<% content_for :title, @page_title %>
+<% content_for :meta_description, @page_description %>
+<% content_for :meta_keywords, @page_keywords %>
+
+<% content_for :stylesheets do %>
+  <style>
+    .hero-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4rem 0;
+    }
+    
+    .feature-card {
+      transition: transform 0.3s ease;
+      border: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+  </style>
+<% end %>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="display-4 fw-bold mb-3">Find Your Dream Job</h1>
+        <p class="lead mb-4">Connect with top companies and discover opportunities that match your skills and ambitions.</p>
+        
+        <div class="d-flex gap-3">
+          <button class="btn btn-light btn-lg">
+            <i class="mdi mdi-magnify me-2"></i>
+            Browse Jobs
+          </button>
+          <button class="btn btn-outline-light btn-lg">
+            <i class="mdi mdi-upload me-2"></i>
+            Upload Resume
+          </button>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="text-center">
+          <i class="mdi mdi-briefcase-search" style="font-size: 12rem; opacity: 0.3;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center mb-5">
+        <h2 class="display-5 fw-bold">Why Choose OpenRoles?</h2>
+        <p class="text-muted">Discover what makes us the preferred choice for job seekers and employers.</p>
+      </div>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card feature-card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="mb-3">
+              <i class="mdi mdi-rocket-launch text-primary" style="font-size: 3rem;"></i>
+            </div>
+            <h5 class="card-title">Fast & Easy</h5>
+            <p class="card-text text-muted">Apply to jobs with just one click. Our streamlined process saves you time.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card feature-card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="mb-3">
+              <i class="mdi mdi-shield-check text-success" style="font-size: 3rem;"></i>
+            </div>
+            <h5 class="card-title">Verified Companies</h5>
+            <p class="card-text text-muted">All our partner companies are verified for authenticity and reliability.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card feature-card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="mb-3">
+              <i class="mdi mdi-account-group text-info" style="font-size: 3rem;"></i>
+            </div>
+            <h5 class="card-title">Expert Support</h5>
+            <p class="card-text text-muted">Get personalized career guidance from our team of experts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="bg-light py-5">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-md-3">
+        <div class="mb-3">
+          <h3 class="display-4 fw-bold text-primary">1,000+</h3>
+          <p class="text-muted mb-0">Active Jobs</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="mb-3">
+          <h3 class="display-4 fw-bold text-success">500+</h3>
+          <p class="text-muted mb-0">Companies</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="mb-3">
+          <h3 class="display-4 fw-bold text-info">10,000+</h3>
+          <p class="text-muted mb-0">Job Seekers</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="mb-3">
+          <h3 class="display-4 fw-bold text-warning">95%</h3>
+          <p class="text-muted mb-0">Success Rate</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<% content_for :scripts do %>
+  <script>
+    // Page-specific JavaScript
+    window.initializePage = function() {
+      console.log('Home page initialized');
+      
+      // Add any page-specific functionality here
+      document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          console.log('Feature card hovered');
+        });
+      });
+    };
+  </script>
+<% end %>

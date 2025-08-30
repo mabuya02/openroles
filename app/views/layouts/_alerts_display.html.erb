@@ -1,0 +1,40 @@
+<% if flash.any? %>
+  <div class="alert-container mb-3">
+    <% flash.each do |type, message| %>
+      <% 
+        # Map Rails flash types to Bootstrap classes
+        alert_class = case type.to_s
+                     when 'notice', 'success'
+                       'alert-success'
+                     when 'alert', 'error', 'danger'
+                       'alert-danger'
+                     when 'warning'
+                       'alert-warning'
+                     when 'info'
+                       'alert-info'
+                     else
+                       'alert-primary'
+                     end
+                     
+        # Map alert types to appropriate icons
+        icon_class = case type.to_s
+                    when 'notice', 'success'
+                      'mdi-check-circle-outline'
+                    when 'alert', 'error', 'danger'
+                      'mdi-alert-circle-outline'
+                    when 'warning'
+                      'mdi-alert-outline'
+                    when 'info'
+                      'mdi-information-outline'
+                    else
+                      'mdi-bell-outline'
+                    end
+      %>
+      <div class="alert <%= alert_class %> alert-dismissible fade show" role="alert">
+        <i class="mdi <%= icon_class %> me-2"></i>
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+  </div>
+<% end %>

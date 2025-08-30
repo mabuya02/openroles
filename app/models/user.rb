@@ -27,4 +27,20 @@ class User < ApplicationRecord
   def blocked?
     [ UserStatus::SUSPENDED, UserStatus::LOCKED ].include?(status)
   end
+
+  def full_name
+    "#{first_name} #{last_name}".strip
+  end
+
+  def has_profile?
+    user_profile.present?
+  end
+
+  def has_resume?
+    user_profile&.resume_attached?
+  end
+
+  def profile_complete?
+    has_profile? && user_profile.bio.present? && user_profile.skills.present?
+  end
 end

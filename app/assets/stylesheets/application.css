@@ -8,3 +8,211 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* Fix dropdown z-index issues */
+#page-topbar .dropdown-menu {
+  z-index: 1050 !important;
+}
+
+.topnav .dropdown-menu {
+  z-index: 1040 !important;
+}
+
+/* Ensure header stays above topnav */
+#page-topbar {
+  z-index: 1030;
+  position: relative;
+}
+
+.topnav {
+  z-index: 1020;
+  position: relative;
+}
+
+/* Fix mega dropdown positioning */
+.mega-dropdown-menu {
+  z-index: 1040 !important;
+}
+
+/* Additional dropdown fixes */
+.dropdown-menu-end {
+  z-index: 1050 !important;
+}
+
+.dropdown-menu-lg {
+  z-index: 1050 !important;
+}
+
+/* Mobile dropdown fixes */
+@media (max-width: 991.98px) {
+  /* Ensure mobile menu is visible when collapsed */
+  .topnav-menu .navbar-collapse.show {
+    display: block !important;
+  }
+  
+  /* Hide dropdown arrows on mobile */
+  .topnav-menu .navbar-nav .nav-item .arrow-down {
+    display: none;
+  }
+  
+  /* Remove default dropdown-toggle arrow */
+  .topnav-menu .navbar-nav .nav-item .dropdown-toggle::after {
+    display: none;
+  }
+  
+  /* Make dropdowns behave like accordions on mobile */
+  .topnav-menu .navbar-nav .nav-item.dropdown,
+  .topnav-menu .dropdown-menu .dropdown {
+    display: block;
+  }
+  
+  .topnav-menu .navbar-nav .nav-item .nav-link {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f3f4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .topnav-menu .navbar-nav .nav-item .nav-link:after {
+    content: '+';
+    font-weight: bold;
+    font-size: 18px;
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    color: #6c757d;
+  }
+  
+  .topnav-menu .navbar-nav .nav-item.show .nav-link:after {
+    content: '−';
+    color: #495057;
+  }
+  
+  /* Dropdown menu styling for mobile */
+  .topnav-menu .navbar-nav .nav-item .dropdown-menu {
+    position: static !important;
+    transform: none !important;
+    box-shadow: none;
+    border: none;
+    background: #f8f9fa;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    display: none;
+    width: 100%;
+    float: none;
+  }
+  
+  .topnav-menu .navbar-nav .nav-item.show .dropdown-menu {
+    display: block !important;
+  }
+  
+  .topnav-menu .navbar-nav .nav-item .dropdown-menu .dropdown-item {
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+    border-bottom: 1px solid #e9ecef;
+    background: transparent;
+    white-space: normal;
+    text-align: left;
+  }
+  
+  .topnav-menu .navbar-nav .nav-item .dropdown-menu .dropdown-item:hover,
+  .topnav-menu .navbar-nav .nav-item .dropdown-menu .dropdown-item:focus {
+    background-color: #e9ecef;
+    color: #495057;
+  }
+  
+  /* Nested dropdown styling */
+  .topnav-menu .dropdown-menu .dropdown {
+    margin: 0;
+    position: relative;
+  }
+  
+  .topnav-menu .dropdown-menu .dropdown .dropdown-item.dropdown-toggle {
+    position: relative;
+    padding-right: 2rem;
+  }
+  
+  .topnav-menu .dropdown-menu .dropdown .dropdown-item.dropdown-toggle:after {
+    content: '+';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    color: #6c757d;
+  }
+  
+  .topnav-menu .dropdown-menu .dropdown.show .dropdown-item.dropdown-toggle:after {
+    content: '−';
+    color: #495057;
+  }
+  
+  .topnav-menu .dropdown-menu .dropdown .dropdown-menu {
+    background: #e9ecef;
+    margin: 0;
+    padding-left: 1rem;
+  }
+  
+  .topnav-menu .dropdown-menu .dropdown .dropdown-menu .dropdown-item {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  /* Mega dropdown mobile styling */
+  .mega-dropdown-menu {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    box-shadow: none;
+    border: none;
+    background: #f8f9fa;
+    border-radius: 0;
+    padding: 0.5rem;
+  }
+  
+  .mega-dropdown-menu .row {
+    margin: 0;
+  }
+  
+  .mega-dropdown-menu .col-lg-4,
+  .mega-dropdown-menu .col-lg-5,
+  .mega-dropdown-menu .col-lg-8 {
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .mega-dropdown-menu .menu-title {
+    font-weight: 600;
+    color: #495057;
+    padding: 0.5rem 0;
+    background: transparent;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    border-bottom: 2px solid #dee2e6;
+  }
+  
+  .mega-dropdown-menu .dropdown-item {
+    padding: 0.4rem 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .mega-dropdown-menu .dropdown-item:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Ensure mobile toggle works */
+@media (max-width: 991.98px) {
+  .topnav-menu {
+    width: 100%;
+  }
+  
+  #topnav-menu-content {
+    margin-top: 1rem;
+  }
+}
