@@ -1,13 +1,159 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      /* Email styles need to be inline */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        background-color: #f8f9fa;
+      }
+      
+      .email-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .email-header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+      
+      .email-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+      
+      .email-body {
+        padding: 40px 30px;
+      }
+      
+      .email-content h2 {
+        color: #333;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+      
+      .email-content p {
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 16px;
+      }
+      
+      .btn {
+        display: inline-block;
+        padding: 15px 30px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+        margin: 20px 0;
+        font-size: 16px;
+      }
+      
+      .btn:hover {
+        background-color: #0056b3;
+      }
+      
+      .verification-code {
+        background-color: #f8f9fa;
+        border: 2px dashed #007bff;
+        padding: 20px;
+        text-align: center;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      
+      .verification-code strong {
+        font-size: 24px;
+        color: #007bff;
+        letter-spacing: 4px;
+      }
+      
+      .email-footer {
+        background-color: #f8f9fa;
+        padding: 30px;
+        text-align: center;
+        border-top: 1px solid #e9ecef;
+      }
+      
+      .email-footer p {
+        margin: 10px 0;
+        color: #6c757d;
+        font-size: 14px;
+      }
+      
+      .divider {
+        height: 1px;
+        background-color: #e9ecef;
+        margin: 30px 0;
+      }
+      
+      .alert {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      
+      .alert-info {
+        background-color: #d1ecf1;
+        border-color: #b6d7ff;
+        color: #0c5460;
+      }
+      
+      @media only screen and (max-width: 600px) {
+        .email-container {
+          margin: 0;
+          box-shadow: none;
+        }
+        
+        .email-header,
+        .email-body,
+        .email-footer {
+          padding: 20px;
+        }
+        
+        .btn {
+          display: block;
+          width: 100%;
+          box-sizing: border-box;
+        }
+      }
     </style>
   </head>
-
   <body>
-    <%= yield %>
+    <div class="email-container">
+      <div class="email-header">
+        <h1>OpenRoles</h1>
+      </div>
+      
+      <div class="email-body">
+        <div class="email-content">
+          <%= yield %>
+        </div>
+      </div>
+      
+      <div class="email-footer">
+        <p><strong>OpenRoles</strong> - Your Career Platform</p>
+        <p>This email was sent from a notification-only address that cannot accept incoming email. Please do not reply to this message.</p>
+        <p>If you have questions, visit our <a href="#" style="color: #007bff;">Help Center</a>.</p>
+        <div class="divider"></div>
+        <p style="font-size: 12px;">© <%= Date.current.year %> OpenRoles. All rights reserved.</p>
+      </div>
+    </div>
   </body>
 </html>

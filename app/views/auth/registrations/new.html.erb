@@ -1,0 +1,318 @@
+<% content_for :title, "Create Account" %>
+
+<!-- Hide preloader on auth pages -->
+<style>
+  #preloader { display: none !important; }
+  .main-content { margin-top: 0; }
+</style>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Create Account</h2>
+          
+          <% if flash[:error] %>
+            <div class="alert alert-danger" role="alert">
+              <%= flash[:error] %>
+            </div>
+          <% end %>
+
+          <%= form_with model: User.new, url: auth_registrations_path, local: true, class: "needs-validation", novalidate: true, data: { turbo: false } do |form| %>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <%= form.label :first_name, class: "form-label" %>
+                <%= form.text_field :first_name, 
+                    class: "form-control", 
+                    placeholder: "First name",
+                    required: true,
+                    autocomplete: "given-name" %>
+                <div class="invalid-feedback">
+                  Please provide your first name.
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <%= form.label :last_name, class: "form-label" %>
+                <%= form.text_field :last_name, 
+                    class: "form-control", 
+                    placeholder: "Last name",
+                    required: true,
+                    autocomplete: "family-name" %>
+                <div class="invalid-feedback">
+                  Please provide your last name.
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :email, class: "form-label" %>
+              <%= form.email_field :email, 
+                  class: "form-control", 
+                  placeholder: "Enter your email address",
+                  required: true,
+                  autocomplete: "email" %>
+              <div class="invalid-feedback">
+                Please provide a valid email address.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :phone_number, "Phone Number (Optional)", class: "form-label" %>
+              <%= form.telephone_field :phone_number, 
+                  class: "form-control", 
+                  placeholder: "+254 758 316403 or +1 555 123 4567",
+                  autocomplete: "tel" %>
+              <div class="form-text">
+                 
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :password, class: "form-label" %>
+              <div class="input-group">
+                <%= form.password_field :password, 
+                    id: "password",
+                    class: "form-control", 
+                    placeholder: "Create a password",
+                    required: true,
+                    minlength: 8,
+                    autocomplete: "new-password" %>
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                  <i class="iconoir-eye-solid" id="passwordIcon"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback">
+                Password must meet all requirements.
+              </div>
+              
+              <!-- Password Requirements -->
+              <div class="password-requirements mt-2">
+                <small class="text-muted d-block mb-2">Password must contain:</small>
+                <div class="row">
+                  <div class="col-md-6">
+                    <small class="requirement" id="length-req">
+                      <i class="mdi mdi-close text-danger"></i> At least 8 characters
+                    </small><br>
+                    <small class="requirement" id="uppercase-req">
+                      <i class="mdi mdi-close text-danger"></i> One uppercase letter
+                    </small><br>
+                    <small class="requirement" id="lowercase-req">
+                      <i class="mdi mdi-close text-danger"></i> One lowercase letter
+                    </small>
+                  </div>
+                  <div class="col-md-6">
+                    <small class="requirement" id="number-req">
+                      <i class="mdi mdi-close text-danger"></i> One number
+                    </small><br>
+                    <small class="requirement" id="special-req">
+                      <i class="mdi mdi-close text-danger"></i> One special character
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :password_confirmation, "Confirm Password", class: "form-label" %>
+              <div class="input-group">
+                <%= form.password_field :password_confirmation, 
+                    id: "passwordConfirmation",
+                    class: "form-control", 
+                    placeholder: "Confirm your password",
+                    required: true,
+                    autocomplete: "new-password" %>
+                <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirmation">
+                  <i class="iconoir-eye-solid" id="passwordConfirmationIcon"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback">
+                Passwords do not match.
+              </div>
+              <div class="password-match mt-2">
+                <small class="requirement" id="match-req">
+                  <i class="mdi mdi-close text-danger"></i> Passwords match
+                </small>
+              </div>
+            </div>
+
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="termsCheck" required>
+              <label class="form-check-label" for="termsCheck">
+                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                <a href="#" class="text-decoration-none">Privacy Policy</a>
+              </label>
+              <div class="invalid-feedback">
+                You must agree to the terms and conditions.
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <%= form.submit "Create Account", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+
+          <hr class="my-4">
+
+          <div class="text-center">
+            <p class="mb-0">Already have an account?</p>
+            <%= link_to "Sign in here", auth_new_session_path, class: "btn btn-outline-primary", data: { turbo: false } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Password visibility toggles
+document.addEventListener('DOMContentLoaded', function() {
+  // Toggle password visibility
+  const togglePassword = document.getElementById('togglePassword');
+  const password = document.getElementById('password');
+  const passwordIcon = document.getElementById('passwordIcon');
+
+  if (togglePassword) {
+    togglePassword.addEventListener('click', function() {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      passwordIcon.classList.toggle('iconoir-eye-solid');
+      passwordIcon.classList.toggle('iconoir-eye-closed');
+    });
+  }
+
+  // Toggle password confirmation visibility
+  const togglePasswordConfirmation = document.getElementById('togglePasswordConfirmation');
+  const passwordConfirmation = document.getElementById('passwordConfirmation');
+  const passwordConfirmationIcon = document.getElementById('passwordConfirmationIcon');
+
+  if (togglePasswordConfirmation) {
+    togglePasswordConfirmation.addEventListener('click', function() {
+      const type = passwordConfirmation.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordConfirmation.setAttribute('type', type);
+      passwordConfirmationIcon.classList.toggle('iconoir-eye-solid');
+      passwordConfirmationIcon.classList.toggle('iconoir-eye-closed');
+    });
+  }
+
+  // Password requirements validation
+  if (password) {
+    password.addEventListener('input', function() {
+      validatePassword(this.value);
+    });
+  }
+
+  // Password confirmation matching
+  if (passwordConfirmation) {
+    passwordConfirmation.addEventListener('input', function() {
+      validatePasswordMatch();
+    });
+  }
+
+  function validatePassword(password) {
+    const requirements = {
+      'length-req': password.length >= 8,
+      'uppercase-req': /[A-Z]/.test(password),
+      'lowercase-req': /[a-z]/.test(password),
+      'number-req': /\d/.test(password),
+      'special-req': /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password)
+    };
+
+    for (const [reqId, isValid] of Object.entries(requirements)) {
+      const element = document.getElementById(reqId);
+      if (element) {
+        const icon = element.querySelector('i');
+        if (isValid) {
+          icon.className = 'mdi mdi-check text-success';
+          element.classList.remove('text-danger');
+          element.classList.add('text-success');
+        } else {
+          icon.className = 'mdi mdi-close text-danger';
+          element.classList.remove('text-success');
+          element.classList.add('text-danger');
+        }
+      }
+    }
+
+    // Update form validity
+    const allValid = Object.values(requirements).every(Boolean);
+    const passwordField = document.getElementById('password');
+    if (allValid) {
+      passwordField.setCustomValidity('');
+    } else {
+      passwordField.setCustomValidity('Password must meet all requirements');
+    }
+
+    validatePasswordMatch();
+  }
+
+  function validatePasswordMatch() {
+    const password = document.getElementById('password');
+    const passwordConfirmation = document.getElementById('passwordConfirmation');
+    const matchReq = document.getElementById('match-req');
+
+    if (password && passwordConfirmation && matchReq) {
+      const isMatch = password.value === passwordConfirmation.value && passwordConfirmation.value !== '';
+      const icon = matchReq.querySelector('i');
+      
+      if (isMatch) {
+        icon.className = 'mdi mdi-check text-success';
+        matchReq.classList.remove('text-danger');
+        matchReq.classList.add('text-success');
+        passwordConfirmation.setCustomValidity('');
+      } else {
+        icon.className = 'mdi mdi-close text-danger';
+        matchReq.classList.remove('text-success');
+        matchReq.classList.add('text-danger');
+        if (passwordConfirmation.value !== '') {
+          passwordConfirmation.setCustomValidity('Passwords do not match');
+        }
+      }
+    }
+  }
+});
+
+// Bootstrap form validation with enhanced password checking
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        var password = form.querySelector('input[name="user[password]"]');
+        var passwordConfirmation = form.querySelector('input[name="user[password_confirmation]"]');
+        
+        // Check if passwords match
+        if (password.value !== passwordConfirmation.value) {
+          passwordConfirmation.setCustomValidity('Passwords do not match');
+        } else {
+          passwordConfirmation.setCustomValidity('');
+        }
+        
+        // Validate password requirements
+        const passwordValue = password.value;
+        const requirements = [
+          passwordValue.length >= 8,
+          /[A-Z]/.test(passwordValue),
+          /[a-z]/.test(passwordValue),
+          /\d/.test(passwordValue),
+          /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(passwordValue)
+        ];
+        
+        if (!requirements.every(Boolean)) {
+          password.setCustomValidity('Password must meet all requirements');
+        } else {
+          password.setCustomValidity('');
+        }
+        
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>

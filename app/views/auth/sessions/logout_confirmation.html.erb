@@ -1,0 +1,43 @@
+<% content_for :title, "Sign Out" %>
+
+<!-- Hide preloader on auth pages -->
+<style>
+  #preloader { display: none !important; }
+  .main-content { margin-top: 0; }
+</style>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="mb-4">
+            <i class="mdi mdi-logout-variant display-4 text-warning"></i>
+          </div>
+          
+          <h4 class="card-title mb-3">Sign Out</h4>
+          
+          <p class="text-muted mb-4">
+            Are you sure you want to sign out of your account?
+          </p>
+
+          <div class="d-flex gap-2 justify-content-center">
+            <%= link_to "Cancel", root_path, class: "btn btn-secondary", data: { turbo: false } %>
+            
+            <%= form_with url: auth_destroy_session_path, method: :delete, local: true, class: "d-inline", data: { turbo: false } do |form| %>
+              <%= form.submit "Yes, Sign Out", class: "btn btn-danger", data: { 
+                disable_with: "<i class='mdi mdi-loading mdi-spin me-2'></i>Signing out..."
+              } %>
+            <% end %>
+          </div>
+
+          <div class="mt-4">
+            <small class="text-muted">
+              You can always sign back in anytime.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

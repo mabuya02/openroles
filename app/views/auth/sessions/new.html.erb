@@ -1,0 +1,112 @@
+<% content_for :title, "Sign In" %>
+
+<!-- Hide preloader on auth pages -->
+<style>
+  #preloader { display: none !important; }
+  .main-content { margin-top: 0; }
+</style>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Sign In</h2>
+          
+          <% if flash[:error] %>
+            <div class="alert alert-danger" role="alert">
+              <%= flash[:error] %>
+            </div>
+          <% end %>
+
+          <%= form_with url: auth_sessions_path, local: true, class: "needs-validation", novalidate: true, data: { turbo: false } do |form| %>
+            <div class="mb-3">
+              <%= form.label :email, class: "form-label" %>
+              <%= form.email_field :email, 
+                  class: "form-control", 
+                  placeholder: "Enter your email",
+                  required: true,
+                  autocomplete: "email" %>
+              <div class="invalid-feedback">
+                Please provide a valid email address.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :password, class: "form-label" %>
+              <div class="input-group">
+                <%= form.password_field :password, 
+                    id: "loginPassword",
+                    class: "form-control", 
+                    placeholder: "Enter your password",
+                    required: true,
+                    autocomplete: "current-password" %>
+                <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword">
+                  <i class="iconoir-eye-solid" id="loginPasswordIcon"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback">
+                Please provide your password.
+              </div>
+            </div>
+
+            <div class="mb-3 form-check">
+              <%= form.check_box :remember_me, class: "form-check-input", id: "rememberMe" %>
+              <%= form.label :remember_me, "Remember me", class: "form-check-label", for: "rememberMe" %>
+            </div>
+
+            <div class="d-grid">
+              <%= form.submit "Sign In", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+
+          <div class="text-center mt-3">
+            <%= link_to "Forgot your password?", auth_new_password_path, class: "text-decoration-none", data: { turbo: false } %>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="text-center">
+            <p class="mb-0">Don't have an account?</p>
+            <%= link_to "Create an account", auth_new_registration_path, class: "btn btn-outline-primary", data: { turbo: false } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Password visibility toggle
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginPasswordIcon = document.getElementById('loginPasswordIcon');
+
+  if (toggleLoginPassword) {
+    toggleLoginPassword.addEventListener('click', function() {
+      const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+      loginPassword.setAttribute('type', type);
+      loginPasswordIcon.classList.toggle('iconoir-eye-solid');
+      loginPasswordIcon.classList.toggle('iconoir-eye-closed');
+    });
+  }
+});
+
+// Bootstrap form validation
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>

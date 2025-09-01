@@ -133,6 +133,9 @@
 .mdi-bell::before { content: "\f09e"; }
 .mdi-account::before { content: "\f004"; }
 .mdi-home::before { content: "\f2dc"; }
+.mdi-eye::before { content: "\f208"; }
+.mdi-eye-off::before { content: "\f209"; }
+.mdi-check::before { content: "\f12c"; }
 
 /* Essential Boxicons */
 .bx-search-alt::before { content: "\ea54"; }
@@ -148,3 +151,7 @@
 .fa-user::before { content: "\f007"; }
 .fa-cog::before { content: "\f013"; }
 .fa-sign-out-alt::before { content: "\f2f5"; }
+.fa-eye::before { content: "\f06e"; }
+.fa-eye-slash::before { content: "\f070"; }
+.fa-times::before { content: "\f00d"; }
+.fa-check::before { content: "\f00c"; }

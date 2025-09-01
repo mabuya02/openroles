@@ -14,9 +14,14 @@ module Openroles
     # ----------------------------
     # Ignore lib subdirectories without Ruby files (like assets or tasks)
     config.autoload_lib(ignore: %w[assets tasks])
-    
+
     # Eager load lib folder in production
     config.eager_load_paths << Rails.root.join("lib")
+
+    # ----------------------------
+    # Job Queue Configuration
+    # ----------------------------
+    config.active_job.queue_adapter = :async
 
     # ----------------------------
     # Timezone Configuration

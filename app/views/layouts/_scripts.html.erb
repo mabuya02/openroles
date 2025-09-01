@@ -9,5 +9,45 @@
 <!-- Local Fixed Minia App Scripts -->
 <%= javascript_include_tag "app-fixed", "data-turbo-track": "reload" %>
 
+<!-- Page Initialization Script -->
+<script>
+  // Traditional page load event handling
+  $(document).ready(function() {
+    // Hide preloader immediately
+    $('#preloader').fadeOut(100);
+    
+    // Initialize components
+    if (typeof feather !== 'undefined') {
+      feather.replace();
+    }
+    
+    // Initialize Bootstrap dropdowns
+    var dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+    dropdownElements.forEach(function(element) {
+      if (!bootstrap.Dropdown.getInstance(element)) {
+        new bootstrap.Dropdown(element);
+      }
+    });
+    
+    // Initialize Bootstrap collapses
+    var collapseElements = document.querySelectorAll('[data-bs-toggle="collapse"]');
+    collapseElements.forEach(function(element) {
+      if (!bootstrap.Collapse.getInstance(element)) {
+        new bootstrap.Collapse(element, { toggle: false });
+      }
+    });
+  });
+
+  // Window load event for additional initialization
+  $(window).on('load', function() {
+    $('#preloader').fadeOut(100);
+    
+    // Initialize any additional components that need window.load
+    if (typeof Waves !== 'undefined') {
+      Waves.init();
+    }
+  });
+</script>
+
 <!-- Page-specific Scripts -->
 <%= yield(:javascript) if content_for?(:javascript) %>

@@ -31,14 +31,29 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  # Email configuration for development
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+
+  # SMTP settings for Zoho
+  config.action_mailer.smtp_settings = {
+    address: "smtp.zoho.com",
+    port: 465,
+    domain: "zoho.com",
+    user_name: "mabuya@zohomail.com",
+    password: "dLCnpQABhs4g",
+    authentication: :login,
+    ssl: true,
+    enable_starttls_auto: false,
+    open_timeout: 10,
+    read_timeout: 10
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_27_104343) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_31_235828) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -120,6 +120,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_104343) do
     t.index ["company_id"], name: "index_jobs_on_company_id"
   end
 
+  create_table "password_reset_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "token", null: false
+    t.string "email", null: false
+    t.datetime "expires_at", null: false
+    t.boolean "used", default: false
+    t.datetime "used_at"
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_password_reset_tokens_on_email"
+    t.index ["expires_at"], name: "index_password_reset_tokens_on_expires_at"
+    t.index ["token", "used"], name: "index_password_reset_tokens_on_token_and_used"
+    t.index ["token"], name: "index_password_reset_tokens_on_token", unique: true
+    t.index ["user_id"], name: "index_password_reset_tokens_on_user_id"
+  end
+
   create_table "saved_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "job_id", null: false
@@ -163,7 +181,39 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_104343) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.string "password_digest"
+    t.string "company"
+    t.text "bio"
+    t.string "avatar_url"
+    t.boolean "two_factor_enabled"
+    t.string "two_factor_secret"
+    t.datetime "last_sign_in_at"
+    t.string "last_sign_in_ip"
+    t.datetime "confirmed_at"
+    t.boolean "phone_verified", default: false, null: false
+    t.boolean "admin", default: false, null: false
+    t.index ["admin"], name: "index_users_on_admin"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["last_sign_in_at"], name: "index_users_on_last_sign_in_at"
+  end
+
+  create_table "verification_codes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "code", null: false
+    t.string "code_type", null: false
+    t.string "contact_method"
+    t.datetime "expires_at", null: false
+    t.boolean "verified", default: false
+    t.datetime "verified_at"
+    t.integer "attempts", default: 0
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code", "code_type"], name: "index_verification_codes_on_code_and_code_type", unique: true
+    t.index ["expires_at"], name: "index_verification_codes_on_expires_at"
+    t.index ["user_id", "code_type"], name: "index_verification_codes_on_user_id_and_code_type"
+    t.index ["user_id"], name: "index_verification_codes_on_user_id"
+    t.index ["verified"], name: "index_verification_codes_on_verified"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -176,7 +226,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_104343) do
   add_foreign_key "job_tags", "jobs"
   add_foreign_key "job_tags", "tags"
   add_foreign_key "jobs", "companies"
+  add_foreign_key "password_reset_tokens", "users"
   add_foreign_key "saved_jobs", "jobs"
   add_foreign_key "saved_jobs", "users"
   add_foreign_key "user_profiles", "users"
+  add_foreign_key "verification_codes", "users"
 end
