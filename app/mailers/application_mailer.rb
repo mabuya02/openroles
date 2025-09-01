@@ -20,7 +20,7 @@ class ApplicationMailer < ActionMailer::Base
     send(mail_method, *args).deliver_now
   rescue => e
     Rails.logger.error "Failed to send email: #{e.message}"
-    raise e if Rails.env.production? # Re-raise in production for monitoring
+    raise e if Rails.env.production?
   end
 
   protected
