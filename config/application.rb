@@ -43,5 +43,32 @@ module Openroles
                        request_specs: true       # generate request specs
       g.fixture_replacement :factory_bot, dir: "spec/factories" # use FactoryBot
     end
+
+    # Email configuration validation
+    config.after_initialize do
+      if Rails.env.production?
+        required_email_vars = %w[
+          SMTP_HOST
+          SMTP_PORT
+          SMTP_USERNAME
+          SMTP_PASSWORD
+          SMTP_DOMAIN
+          FROM_EMAIL
+          SUPPORT_EMAIL
+          APP_HOST
+        ]
+
+        missing_vars = required_email_vars.select { |var| ENV[var].blank? }
+
+        if missing_vars.any?
+          raise "Missing required email environment variables: #{missing_vars.join(', ')}"
+        end
+
+        Rails.logger.info "Email configuration validated successfully"
+      elsif Rails.env.development?
+        missing_vars = %w[SMTP_HOST SMTP_USERNAME SMTP_PASSWORD].select { |var| ENV[var].blank? }
+        Rails.logger.warn "Missing email environment variables: #{missing_vars.join(', ')}" if missing_vars.any?
+      end
+    end
   end
 end

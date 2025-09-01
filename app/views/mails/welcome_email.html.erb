@@ -1,0 +1,24 @@
+<h2>Welcome to <%= @app_name %>!</h2>
+
+<p>Hi <%= @user.first_name %>,</p>
+
+<p>Welcome to <%= @app_name %>! We're excited to have you join our community.</p>
+
+<p>Your account has been created successfully. You can now:</p>
+<ul>
+  <li>Search for jobs</li>
+  <li>Set up job alerts</li>
+  <li>Apply to positions</li>
+  <li>Build your professional profile</li>
+</ul>
+
+<div style="margin: 30px 0; text-align: center;">
+  <a href="<%= @login_url %>" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+    Get Started
+  </a>
+</div>
+
+<p>If you have any questions, feel free to reach out to us at <%= @support_email %>.</p>
+
+<p>Best regards,<br>
+The <%= @app_name %> Team</p>

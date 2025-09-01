@@ -34,26 +34,34 @@ Rails.application.configure do
   # Email configuration for development
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
-
-  # Make template changes take effect immediately.
+  config.action_mailer.perform_deliveries = true
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("APP_HOST", "localhost:3000"),
+    protocol: ENV.fetch("APP_PROTOCOL", "http")
+  }
 
-  # SMTP settings for Zoho
+  # SMTP settings from environment variables
   config.action_mailer.smtp_settings = {
-    address: "smtp.zoho.com",
-    port: 465,
-    domain: "zoho.com",
-    user_name: "mabuya@zohomail.com",
-    password: "dLCnpQABhs4g",
-    authentication: :login,
-    ssl: true,
-    enable_starttls_auto: false,
+    address: ENV.fetch("SMTP_HOST", "localhost"),
+    port: ENV.fetch("SMTP_PORT", "1025").to_i,
+    domain: ENV.fetch("SMTP_DOMAIN", "localhost"),
+    user_name: ENV["SMTP_USERNAME"],
+    password: ENV["SMTP_PASSWORD"],
+    authentication: ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
+    ssl: ENV.fetch("SMTP_PORT", "587").to_i == 465, # SSL for port 465, STARTTLS for 587
+    enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS", "true") == "true",
     open_timeout: 10,
     read_timeout: 10
   }
+
+  # Asset host for emails
+  config.action_mailer.asset_host = "#{ENV.fetch('APP_PROTOCOL', 'http')}://#{ENV.fetch('APP_HOST', 'localhost:3000')}"
+
+  # Preview emails at /rails/mailers
+  config.action_mailer.show_previews = true
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -69,6 +77,9 @@ Rails.application.configure do
 
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
+
+  # Use async job queue for development (immediate processing in separate thread)
+  config.active_job.queue_adapter = :async
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true

@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_31_235828) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_01_124703) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
@@ -49,7 +50,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_235828) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.string "frequency", default: "daily"
+    t.datetime "last_notified_at"
+    t.string "unsubscribe_token"
+    t.index ["frequency"], name: "index_alerts_on_frequency"
+    t.index ["last_notified_at"], name: "index_alerts_on_last_notified_at"
+    t.index ["unsubscribe_token"], name: "index_alerts_on_unsubscribe_token", unique: true
     t.index ["user_id"], name: "index_alerts_on_user_id"
+  end
+
+  create_table "alerts_tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "alert_id", null: false
+    t.uuid "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["alert_id", "tag_id"], name: "index_alerts_tags_on_alert_id_and_tag_id", unique: true
+    t.index ["alert_id"], name: "index_alerts_tags_on_alert_id"
+    t.index ["tag_id"], name: "index_alerts_tags_on_tag_id"
   end
 
   create_table "applications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -76,7 +93,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_235828) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.string "slug"
     t.index ["name"], name: "index_companies_on_name", unique: true
+    t.index ["slug"], name: "index_companies_on_slug", unique: true
   end
 
   create_table "job_metadata", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -117,7 +136,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_235828) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.string "external_id"
+    t.string "source"
+    t.string "fingerprint"
+    t.datetime "posted_at"
+    t.string "apply_url"
+    t.jsonb "raw_payload", default: {}
+    t.decimal "salary_min", precision: 12, scale: 2
+    t.decimal "salary_max", precision: 12, scale: 2
+    t.tsvector "search_vector"
     t.index ["company_id"], name: "index_jobs_on_company_id"
+    t.index ["description"], name: "index_jobs_on_description_trgm", opclass: :gin_trgm_ops, using: :gin
+    t.index ["fingerprint"], name: "index_jobs_on_fingerprint", unique: true, where: "(fingerprint IS NOT NULL)"
+    t.index ["location"], name: "index_jobs_on_location_trgm", opclass: :gin_trgm_ops, using: :gin
+    t.index ["posted_at"], name: "index_jobs_on_posted_at"
+    t.index ["salary_min", "salary_max"], name: "index_jobs_on_salary_min_and_salary_max"
+    t.index ["search_vector"], name: "index_jobs_on_search_vector", using: :gin
+    t.index ["source", "external_id"], name: "index_jobs_on_source_and_external_id", unique: true, where: "(external_id IS NOT NULL)"
+    t.index ["title"], name: "index_jobs_on_title_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "password_reset_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -219,6 +255,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_235828) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "alerts", "users"
+  add_foreign_key "alerts_tags", "alerts"
+  add_foreign_key "alerts_tags", "tags"
   add_foreign_key "applications", "jobs"
   add_foreign_key "applications", "user_profiles", column: "resume_id"
   add_foreign_key "applications", "users"

@@ -84,11 +84,15 @@ class Auth::PasswordResetService
   def send_reset_email
     return unless @user && @reset_token
 
-    # Send password reset email
-    UserMailer.password_reset(@user, @reset_token.token).deliver_now
-    Rails.logger.info "Password reset email sent to #{@user.email}"
+    # Send password reset email via background job
+    UserMailerJob.perform_later(
+      mailer_method: "password_reset",
+      user_id: @user.id,
+      reset_token: @reset_token.token
+    )
+    Rails.logger.info "Password reset email queued for #{@user.email}"
   rescue => e
-    Rails.logger.error "Failed to send password reset email to #{@user.email}: #{e.message}"
+    Rails.logger.error "Failed to queue password reset email for #{@user.email}: #{e.message}"
     # Don't add to @errors for security reasons - always show success message
   end
 

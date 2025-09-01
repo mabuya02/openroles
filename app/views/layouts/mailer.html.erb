@@ -138,7 +138,7 @@
   <body>
     <div class="email-container">
       <div class="email-header">
-        <h1>OpenRoles</h1>
+        <h1><%= @app_name || ENV.fetch('APP_NAME', 'OpenRoles') %></h1>
       </div>
       
       <div class="email-body">
@@ -148,11 +148,11 @@
       </div>
       
       <div class="email-footer">
-        <p><strong>OpenRoles</strong> - Your Career Platform</p>
+        <p><strong><%= @app_name || ENV.fetch('APP_NAME', 'OpenRoles') %></strong> - Your Career Platform</p>
         <p>This email was sent from a notification-only address that cannot accept incoming email. Please do not reply to this message.</p>
-        <p>If you have questions, visit our <a href="#" style="color: #007bff;">Help Center</a>.</p>
+        <p>If you have questions, contact us at <a href="mailto:<%= @support_email || ENV.fetch('SUPPORT_EMAIL', 'support@openroles.com') %>" style="color: #007bff;"><%= @support_email || ENV.fetch('SUPPORT_EMAIL', 'support@openroles.com') %></a>.</p>
         <div class="divider"></div>
-        <p style="font-size: 12px;">© <%= Date.current.year %> OpenRoles. All rights reserved.</p>
+        <p style="font-size: 12px;">© <%= Date.current.year %> <%= @app_name || ENV.fetch('APP_NAME', 'OpenRoles') %>. All rights reserved.</p>
       </div>
     </div>
   </body>
