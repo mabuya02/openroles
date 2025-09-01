@@ -60,7 +60,7 @@ group :development, :test do
   # Environment variable management
   gem "dotenv-rails"
 
-  gem "rspec-rails", "~> 6.0"
+  gem "rspec-rails", "~> 8.0"
 end
 
 group :development do
