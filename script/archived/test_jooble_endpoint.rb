@@ -7,7 +7,7 @@ puts "🔍 Testing Jooble API Endpoint Formats"
 puts "=" * 50
 
 # Test data
-api_key = ENV['JOOBLE_API_KEY'] || '63f25532-8e66-45db-b244-a60f4c0561f6'
+api_key = ENV['JOOBLE_API_KEY'] || ''
 request_body = {
   keywords: "developer",
   location: "remote",
