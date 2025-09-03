@@ -1,0 +1,310 @@
+<% content_for :title, "#{@job.title} at #{@job.company.name}" %>
+<% content_for :description, truncate(strip_tags(@job.description), length: 160) %>
+
+<div class="container-fluid">
+  <!-- Breadcrumb -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+          <h4 class="mb-sm-0">Job Details</h4>
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item"><%= link_to "Home", root_path, data: { turbo: false } %></li>
+              <li class="breadcrumb-item"><%= link_to "Jobs", jobs_path, data: { turbo: false } %></li>
+              <li class="breadcrumb-item active"><%= truncate(@job.title, length: 30) %></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Main Job Content -->
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-body">
+            <!-- Job Header -->
+            <div class="d-flex align-items-start mb-4">
+              <div class="flex-shrink-0">
+                <div class="avatar-lg">
+                  <div class="avatar-title bg-light text-primary rounded-3 fs-2">
+                    <i class="iconoir-briefcase"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-grow-1 ms-4">
+                <h3 class="fw-bold mb-2"><%= @job.title %></h3>
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                  <div class="d-flex align-items-center">
+                    <i class="iconoir-building me-2 text-primary"></i>
+                    <%= link_to @job.company.name, company_path(@job.company), 
+                        class: "text-primary text-decoration-none fw-medium fs-15",
+                        data: { turbo: false } %>
+                  </div>
+                  <% if @job.location.present? %>
+                    <div class="d-flex align-items-center">
+                      <i class="iconoir-map-pin me-2 text-muted"></i>
+                      <span class="text-muted"><%= @job.location %></span>
+                    </div>
+                  <% end %>
+                  <div class="d-flex align-items-center">
+                    <i class="iconoir-clock me-2 text-muted"></i>
+                    <span class="text-muted">Posted <%= time_ago_in_words(@job.created_at) %> ago</span>
+                  </div>
+                </div>
+
+                <!-- Job Tags -->
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <span class="badge bg-primary-subtle text-primary fs-12 px-3 py-2">
+                    <%= @job.employment_type&.humanize || 'Full-time' %>
+                  </span>
+                  <% if @job.salary_min.present? || @job.salary_max.present? || @job.salary.present? %>
+                    <span class="badge bg-success-subtle text-success fs-12 px-3 py-2">
+                      <i class="iconoir-dollar me-1"></i>
+                      <% if @job.salary_min && @job.salary_max %>
+                        $<%= number_with_delimiter(@job.salary_min) %> - $<%= number_with_delimiter(@job.salary_max) %>
+                      <% elsif @job.salary_min %>
+                        From $<%= number_with_delimiter(@job.salary_min) %>
+                      <% elsif @job.salary_max %>
+                        Up to $<%= number_with_delimiter(@job.salary_max) %>
+                      <% end %>
+                      <% if @job.currency != 'USD' %>
+                        <%= @job.currency %>
+                      <% end %>
+                    </span>
+                  <% end %>
+                  <% if @job.location&.downcase&.include?('remote') %>
+                    <span class="badge bg-info-subtle text-info fs-12 px-3 py-2">
+                      <i class="iconoir-home-wifi me-1"></i>Remote
+                    </span>
+                  <% end %>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex flex-wrap gap-2">
+                  <% if @job.apply_url.present? %>
+                    <%= link_to @job.apply_url, 
+                        class: "btn btn-primary btn-lg px-4",
+                        target: "_blank", rel: "noopener" do %>
+                      <i class="iconoir-external-link me-2"></i>Apply Now
+                    <% end %>
+                  <% end %>
+                  <button class="btn btn-outline-primary btn-lg px-4" id="save-job-btn" 
+                          data-job-id="<%= @job.id %>">
+                    <i class="iconoir-bookmark me-2"></i>Save Job
+                  </button>
+                  <button class="btn btn-outline-secondary btn-lg px-4" id="share-job-btn">
+                    <i class="iconoir-share me-2"></i>Share
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Description -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Job Description</h5>
+          </div>
+          <div class="card-body">
+            <div class="job-description">
+              <%= simple_format(@job.description) %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills & Tags -->
+        <% if @job.tags.any? %>
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Skills & Technologies</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex flex-wrap gap-2">
+                <% @job.tags.each do |tag| %>
+                  <span class="badge bg-secondary-subtle text-secondary fs-13 px-3 py-2">
+                    <%= tag.name %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Related Jobs -->
+        <% if @related_jobs.any? %>
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Related Jobs</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <% @related_jobs.each do |related_job| %>
+                  <div class="col-md-6 mb-3">
+                    <div class="border rounded p-3">
+                      <h6 class="mb-2">
+                        <%= link_to related_job.title, job_path(related_job), 
+                            class: "text-dark text-decoration-none",
+                            data: { turbo: false } %>
+                      </h6>
+                      <p class="text-muted mb-2 fs-13">
+                        <%= related_job.company.name %> • <%= related_job.location %>
+                      </p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                          <%= time_ago_in_words(related_job.created_at) %> ago
+                        </small>
+                        <%= link_to "View", job_path(related_job), 
+                            class: "btn btn-sm btn-outline-primary",
+                            data: { turbo: false } %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Company Info -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">About the Company</h5>
+          </div>
+          <div class="card-body">
+            <div class="text-center mb-3">
+              <div class="avatar-lg mx-auto mb-3">
+                <div class="avatar-title bg-light text-primary rounded-3 fs-2">
+                  <i class="iconoir-building"></i>
+                </div>
+              </div>
+              <h5 class="mb-2">
+                <%= link_to @job.company.name, company_path(@job.company), 
+                    class: "text-primary text-decoration-none",
+                    data: { turbo: false } %>
+              </h5>
+              <% if @job.company.industry.present? %>
+                <p class="text-muted mb-2"><%= @job.company.industry %></p>
+              <% end %>
+              <% if @job.company.location.present? %>
+                <p class="text-muted mb-3">
+                  <i class="iconoir-map-pin me-1"></i><%= @job.company.location %>
+                </p>
+              <% end %>
+            </div>
+
+            <% if @job.company.industry.present? %>
+              <div class="mb-3">
+                <p class="text-muted fs-13">
+                  <i class="iconoir-category me-2"></i>Industry: <%= @job.company.industry %>
+                </p>
+              </div>
+            <% end %>
+
+            <% if @job.company.website.present? %>
+              <div class="mb-3">
+                <p class="text-muted fs-13">
+                  <i class="iconoir-globe me-2"></i>
+                  <%= link_to @job.company.website, @job.company.website, 
+                      target: "_blank", rel: "noopener", 
+                      class: "text-decoration-none" do %>
+                    Visit Website
+                    <i class="iconoir-external-link ms-1"></i>
+                  <% end %>
+                </p>
+              </div>
+            <% end %>
+
+            <div class="d-grid">
+              <%= link_to "View Company Profile", company_path(@job.company), 
+                  class: "btn btn-outline-primary",
+                  data: { turbo: false } %>
+            </div>
+
+            <!-- Company Stats -->
+            <div class="mt-4">
+              <div class="row text-center">
+                <div class="col-6">
+                  <h5 class="fw-bold text-primary mb-0">
+                    <%= @job.company.jobs.published.count %>
+                  </h5>
+                  <p class="text-muted mb-0 fs-13">Open Jobs</p>
+                </div>
+                <div class="col-6">
+                  <h5 class="fw-bold text-primary mb-0">
+                    <%= @job.company.website.present? ? 'Yes' : 'No' %>
+                  </h5>
+                  <p class="text-muted mb-0 fs-13">Website</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Details -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Job Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Employment Type</span>
+              <span class="fw-medium"><%= @job.employment_type&.humanize || 'Full-time' %></span>
+            </div>
+            <% if @job.location.present? %>
+              <div class="d-flex justify-content-between py-2 border-bottom">
+                <span class="text-muted">Location</span>
+                <span class="fw-medium"><%= @job.location %></span>
+              </div>
+            <% end %>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Posted</span>
+              <span class="fw-medium"><%= @job.created_at.strftime("%B %d, %Y") %></span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Source</span>
+              <span class="fw-medium"><%= @job.source&.humanize || 'Direct' %></span>
+            </div>
+            <% if @job.salary_min.present? || @job.salary_max.present? || @job.salary.present? %>
+              <div class="d-flex justify-content-between py-2">
+                <span class="text-muted">Salary Range</span>
+                <span class="fw-medium text-success">
+                  <% if @job.salary_min && @job.salary_max %>
+                    $<%= number_with_delimiter(@job.salary_min) %> - $<%= number_with_delimiter(@job.salary_max) %>
+                  <% elsif @job.salary_min %>
+                    From $<%= number_with_delimiter(@job.salary_min) %>
+                  <% elsif @job.salary_max %>
+                    Up to $<%= number_with_delimiter(@job.salary_max) %>
+                  <% end %>
+                  <% if @job.currency != 'USD' %>
+                    <%= @job.currency %>
+                  <% end %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.job-description {
+  line-height: 1.7;
+}
+
+.job-description p {
+  margin-bottom: 1rem;
+}
+
+.job-description ul,
+.job-description ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+</style>

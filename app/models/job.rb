@@ -15,21 +15,31 @@ class Job < ApplicationRecord
   validates :fingerprint, uniqueness: true, allow_blank: true
   validates :salary_min, :salary_max, numericality: { greater_than_or_equal_to: 0 }, allow_blank: true
   validates :apply_url, format: { with: URI::DEFAULT_PARSER.make_regexp }, allow_blank: true
+  validates :currency, presence: true, inclusion: { in: %w[USD EUR GBP CAD AUD JPY CHF SEK NOK DKK] }
 
   # Scopes for search and filtering
   scope :published, -> { where(status: JobStatus::OPEN) }
+  scope :closed_or_expired, -> { where(status: [ JobStatus::CLOSED, JobStatus::EXPIRED ]) }
+  scope :recently_updated, -> { where(updated_at: 1.week.ago..Time.current) }
   scope :from_source, ->(source) { where(source: source) }
   scope :with_salary_range, ->(min, max) { where(salary_min: min..max).or(where(salary_max: min..max)) }
-  scope :posted_after, ->(date) { where("posted_at >= ?", date) }
-  scope :posted_before, ->(date) { where("posted_at <= ?", date) }
+  scope :posted_after, ->(date) { where("jobs.posted_at >= ?", date) }
+  scope :posted_before, ->(date) { where("jobs.posted_at <= ?", date) }
+  scope :remote_friendly, -> { where("jobs.location ILIKE ? OR jobs.location ILIKE ?", "%remote%", "%worldwide%") }
+  scope :with_salary, -> { where.not(salary_min: nil).or(where.not(salary_max: nil)) }
 
   # Full-text search scope
-  scope :search, ->(query) { where("search_vector @@ plainto_tsquery('english', ?)", query) }
-  scope :fuzzy_search, ->(query) { where("title % ? OR description % ?", query, query) }
+  scope :search, ->(query) { where("jobs.search_vector @@ plainto_tsquery('english', ?)", query) }
+  scope :fuzzy_search, ->(query) { where("jobs.title % ? OR jobs.description % ?", query, query) }
 
   # Callbacks
   before_validation :generate_fingerprint, if: -> { external_id.blank? }
   before_validation :set_posted_at, if: -> { posted_at.blank? }
+
+  # Check if job is remote-friendly
+  def remote_friendly?
+    location.to_s.downcase.match?(/remote|worldwide|anywhere/)
+  end
 
   private
 

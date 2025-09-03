@@ -1,3 +1,16 @@
+# External API Job Fetching
+fetch_jobs_hourly:
+  class: JobFetchJob
+  queue: default
+  args: [{ limit: 50 }]
+  schedule: every hour
+
+fetch_jobs_daily_comprehensive:
+  class: JobFetchJob
+  queue: default
+  args: [{ limit: 100 }]
+  schedule: at 6am every day
+
 # examples:
 #   periodic_cleanup:
 #     class: CleanSoftDeletedRecordsJob

@@ -45,6 +45,42 @@ Rails.application.routes.draw do
     delete :remove_attachment
   end
 
+  # Job browsing routes
+  resources :jobs, only: [ :index, :show ] do
+    collection do
+      get :search
+      get :filter
+    end
+  end
+
+  # Company routes
+  resources :companies, only: [ :index, :show ] do
+    collection do
+      get :search
+    end
+    member do
+      get :jobs
+    end
+  end
+
+  # Remote jobs routes
+  resources :remote, only: [ :index ], controller: "remote_jobs", as: :remote_jobs do
+    collection do
+      get :search
+      get :filter
+    end
+  end
+
+  # API routes
+  namespace :api do
+    resource :job_fetcher, only: [] do
+      post :fetch_all
+      post :fetch_from_source
+      get :recent
+      get :status
+    end
+  end
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

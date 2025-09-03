@@ -1,0 +1,341 @@
+<% content_for :title, "Remote Jobs - Work From Anywhere" %>
+<% content_for :description, "Discover the best remote job opportunities. Work from home, anywhere in the world, with flexible schedules and competitive salaries." %>
+
+<!-- Hero Banner -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-info-subtle rounded-3 p-4 text-center">
+      <div class="d-inline-flex align-items-center justify-content-center bg-info rounded-circle mb-3" style="width: 60px; height: 60px;">
+        <i class="iconoir-wifi fs-3 text-white"></i>
+      </div>
+      <h2 class="fw-bold text-dark mb-2">Work From Anywhere</h2>
+      <p class="text-muted mb-0 fs-16">
+        Discover <%= @pagy ? @pagy.count : @jobs.size %> remote opportunities that let you work from home, a coffee shop, or anywhere in the world.
+      </p>
+    </div>
+  </div>
+</div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <%= form_with url: search_remote_jobs_path, method: :get, local: true, class: "row g-3" do |f| %>
+              <div class="col-md-3">
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="iconoir-search text-muted"></i>
+                  </span>
+                  <%= f.text_field :q, placeholder: "Job title or keywords", 
+                      value: params[:q], class: "form-control border-start-0 ps-0", 
+                      id: "remote-job-search-input" %>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="iconoir-tag text-muted"></i>
+                  </span>
+                  <%= f.text_field :skills, placeholder: "Skills (comma separated)", 
+                      value: params[:skills], class: "form-control border-start-0 ps-0",
+                      id: "skills-search-input" %>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <%= f.select :employment_type, 
+                    options_for_select([
+                      ['All Types', ''],
+                      ['Full-time', EmploymentType::FULL_TIME],
+                      ['Part-time', EmploymentType::PART_TIME],
+                      ['Contract', EmploymentType::CONTRACT],
+                      ['Freelance', EmploymentType::FREELANCE]
+                    ], params[:employment_type]),
+                    {}, { class: "form-select" } %>
+              </div>
+              <div class="col-md-2">
+                <%= f.select :experience_level,
+                    options_for_select([
+                      ['All Levels', ''],
+                      ['Entry Level', 'entry'],
+                      ['Mid Level', 'mid'],
+                      ['Senior Level', 'senior']
+                    ], params[:experience_level]),
+                    {}, { class: "form-select" } %>
+              </div>
+              <div class="col-md-2">
+                <%= f.select :has_salary,
+                    options_for_select([
+                      ['All Salaries', ''],
+                      ['With Salary', 'true']
+                    ], params[:has_salary]),
+                    {}, { class: "form-select" } %>
+              </div>
+              <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex gap-2">
+                    <%= f.submit "Search Remote Jobs", class: "btn btn-primary px-4" %>
+                    <%= link_to "Clear Filters", remote_jobs_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jobs List -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="card-title mb-0">
+              <%= @pagy ? "#{@pagy.count} Remote Jobs Found" : "Latest Remote Jobs" %>
+            </h5>
+            <div class="flex-shrink-0">
+              <select class="form-select form-select-sm" id="sort-select">
+                <option value="newest">Newest First</option>
+                <option value="salary-high">Salary: High to Low</option>
+                <option value="salary-low">Salary: Low to High</option>
+                <option value="company">Company A-Z</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <% if @jobs.present? %>
+              <% @jobs.each_with_index do |job, index| %>
+                <div class="border-bottom remote-job-item" data-job-id="<%= job.id %>">
+                  <div class="p-4">
+                    <div class="row align-items-center">
+                      <div class="col-md-8">
+                        <div class="d-flex align-items-start">
+                          <div class="flex-shrink-0">
+                            <div class="avatar-md">
+                              <div class="avatar-title bg-success-subtle text-success rounded-3 fs-3">
+                                <i class="iconoir-home-wifi"></i>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex-grow-1 ms-3">
+                            <h5 class="fs-16 mb-2">
+                              <%= link_to job.title, job_path(job), 
+                                  class: "text-dark text-decoration-none remote-job-title-link",
+                                  data: { turbo: false } %>
+                              <span class="badge bg-success-subtle text-success ms-2">
+                                <i class="iconoir-home-wifi me-1"></i>Remote
+                              </span>
+                            </h5>
+                            <p class="text-muted mb-2">
+                              <%= link_to job.company.name, company_path(job.company), 
+                                  class: "text-primary text-decoration-none fw-medium",
+                                  data: { turbo: false } %>
+                              <% if job.location.present? && job.location.downcase != 'remote' %>
+                                <span class="mx-2">•</span>
+                                <i class="iconoir-map-pin me-1"></i><%= job.location %>
+                              <% else %>
+                                <span class="mx-2">•</span>
+                                <i class="iconoir-earth me-1"></i>Worldwide
+                              <% end %>
+                            </p>
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                              <span class="badge bg-primary-subtle text-primary">
+                                <%= job.employment_type&.humanize || 'Full-time' %>
+                              </span>
+                              <% if job.salary_min.present? || job.salary_max.present? || job.salary.present? %>
+                                <span class="badge bg-success-subtle text-success">
+                                  <i class="iconoir-dollar me-1"></i>
+                                  <% if job.salary_min && job.salary_max %>
+                                    $<%= number_with_delimiter(job.salary_min) %> - $<%= number_with_delimiter(job.salary_max) %>
+                                  <% elsif job.salary_min %>
+                                    From $<%= number_with_delimiter(job.salary_min) %>
+                                  <% elsif job.salary_max %>
+                                    Up to $<%= number_with_delimiter(job.salary_max) %>
+                                  <% end %>
+                                  <% if job.currency != 'USD' %>
+                                    <%= job.currency %>
+                                  <% end %>
+                                </span>
+                              <% end %>
+                              <% if job.tags.any? %>
+                                <% job.tags.limit(4).each do |tag| %>
+                                  <span class="badge bg-secondary-subtle text-secondary">
+                                    <%= tag.name %>
+                                  </span>
+                                <% end %>
+                                <% if job.tags.count > 4 %>
+                                  <span class="badge bg-light text-muted">
+                                    +<%= job.tags.count - 4 %> more
+                                  </span>
+                                <% end %>
+                              <% end %>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4 text-md-end">
+                        <p class="text-muted mb-2 fs-13">
+                          <i class="iconoir-clock me-1"></i>
+                          <%= time_ago_in_words(job.created_at) %> ago
+                        </p>
+                        <div class="d-flex flex-md-column flex-row gap-2 justify-content-md-end">
+                          <%= link_to "View Details", job_path(job), 
+                              class: "btn btn-primary btn-sm",
+                              data: { turbo: false } %>
+                          <% if job.apply_url.present? %>
+                            <%= link_to job.apply_url, 
+                                class: "btn btn-outline-success btn-sm",
+                                target: "_blank", rel: "noopener" do %>
+                              <i class="iconoir-external-link me-1"></i>Apply Remote
+                            <% end %>
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="text-center py-5">
+                <div class="avatar-lg mx-auto mb-4">
+                  <div class="avatar-title bg-light text-muted rounded-circle fs-1">
+                    <i class="iconoir-search"></i>
+                  </div>
+                </div>
+                <h5 class="mb-3">No Remote Jobs Found</h5>
+                <p class="text-muted mb-4">
+                  We couldn't find any remote jobs matching your criteria. Try adjusting your search filters or browse all remote opportunities.
+                </p>
+                <%= link_to "Browse All Remote Jobs", remote_jobs_path, class: "btn btn-primary", data: { turbo: false } %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <% if defined?(@pagy) && @pagy %>
+      <div class="row">
+        <div class="col-12">
+          <div class="text-center">
+            <%== pagy_bootstrap_nav_no_turbo(@pagy) %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Remote Work Benefits -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Why Choose Remote Work?</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="text-center p-3">
+                  <div class="avatar-sm mx-auto mb-3">
+                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                      <i class="iconoir-clock"></i>
+                    </div>
+                  </div>
+                  <h6 class="fw-bold">Flexible Hours</h6>
+                  <p class="text-muted fs-13 mb-0">Work when you're most productive</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="text-center p-3">
+                  <div class="avatar-sm mx-auto mb-3">
+                    <div class="avatar-title bg-success-subtle text-success rounded-circle">
+                      <i class="iconoir-home"></i>
+                    </div>
+                  </div>
+                  <h6 class="fw-bold">Work From Home</h6>
+                  <p class="text-muted fs-13 mb-0">Comfort of your own space</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="text-center p-3">
+                  <div class="avatar-sm mx-auto mb-3">
+                    <div class="avatar-title bg-warning-subtle text-warning rounded-circle">
+                      <i class="iconoir-dollar"></i>
+                    </div>
+                  </div>
+                  <h6 class="fw-bold">Save Money</h6>
+                  <p class="text-muted fs-13 mb-0">No commuting or office expenses</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="text-center p-3">
+                  <div class="avatar-sm mx-auto mb-3">
+                    <div class="avatar-title bg-info-subtle text-info rounded-circle">
+                      <i class="iconoir-earth"></i>
+                    </div>
+                  </div>
+                  <h6 class="fw-bold">Global Access</h6>
+                  <p class="text-muted fs-13 mb-0">Work with companies worldwide</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured Remote Companies -->
+    <% if @featured_remote_companies.present? %>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Top Remote-Friendly Companies</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <% @featured_remote_companies.limit(8).each do |company| %>
+                  <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                      <div class="avatar-sm mx-auto mb-2">
+                        <div class="avatar-title bg-light text-primary rounded">
+                          <i class="iconoir-building"></i>
+                        </div>
+                      </div>
+                      <h6 class="fs-14 mb-1">
+                        <%= link_to company.name, company_path(company), 
+                            class: "text-dark text-decoration-none",
+                            data: { turbo: false } %>
+                      </h6>
+                      <p class="text-muted fs-12 mb-0">
+                        <%= company.respond_to?(:jobs_count) ? company.jobs_count : company.jobs.remote_friendly.published.count %> remote jobs
+                      </p>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+<style>
+.remote-job-item {
+  transition: background-color 0.2s ease;
+}
+
+.remote-job-item:hover {
+  background-color: rgba(0, 123, 255, 0.02);
+}
+
+.remote-job-title-link:hover {
+  color: var(--bs-primary) !important;
+}
+
+.counter-value {
+  transition: all 0.3s ease;
+}
+</style>
+</style>

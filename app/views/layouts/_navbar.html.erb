@@ -17,173 +17,27 @@
         </div>
 
         <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content" aria-controls="topnav-menu-content" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="fa fa-fw fa-bars icon-md"></i>
+          <i class="iconoir-menu icon-md"></i>
         </button>
 
         <!-- Mobile Navigation Menu -->
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu d-lg-none position-absolute" data-controller="mobile-nav" style="top: 100%; left: 0; right: 0; z-index: 1000;">
           <div class="collapse navbar-collapse" id="topnav-menu-content">
             <ul class="navbar-nav w-100">
-              <li class="nav-item dropdown" data-mobile-nav-target="dropdown">
-                <%= link_to root_path, class: "nav-link dropdown-toggle arrow-none", id: "topnav-dashboard", role: "button", "data-bs-toggle": "dropdown", "aria-expanded": "false", data: { 'mobile-nav-target': 'dropdownToggle', turbo: false } do %>
-                  <i class="iconoir-home-simple icon-md me-3"></i><span data-key="t-dashboards">Dashboard</span>
+              <li class="nav-item">
+                <%= link_to jobs_path, class: "nav-link d-flex align-items-center", data: { turbo: false } do %>
+                  <i class="iconoir-briefcase icon-md me-3"></i><span>Browse Jobs</span>
                 <% end %>
-                <div class="dropdown-menu" aria-labelledby="topnav-dashboard">
-                  <!-- Add dashboard dropdown items if needed -->
-                </div>
               </li>
-
-              <li class="nav-item dropdown" data-mobile-nav-target="dropdown">
-                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-uielement" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                  <i class="iconoir-box icon-md me-3"></i>
-                  <span data-key="t-elements">Elements</span>
-                  <div class="arrow-down"></div>
-                </a>
-                <div class="dropdown-menu mega-dropdown-menu px-2 dropdown-mega-menu-xl" aria-labelledby="topnav-uielement">
-                  <div class="ps-2 p-lg-0">
-                    <div class="row">
-                      <div class="col-lg-8">
-                        <div>
-                          <div class="menu-title">Elements</div>
-                          <div class="row g-0">
-                            <div class="col-lg-5">
-                              <div>
-                                <a href="ui-alerts.html" class="dropdown-item" data-key="t-alerts">Alerts</a>
-                                <a href="ui-buttons.html" class="dropdown-item" data-key="t-buttons">Buttons</a>
-                                <a href="ui-cards.html" class="dropdown-item" data-key="t-cards">Cards</a>
-                                <a href="ui-carousel.html" class="dropdown-item" data-key="t-carousel">Carousel</a>
-                                <a href="ui-dropdowns.html" class="dropdown-item" data-key="t-dropdowns">Dropdowns</a>
-                                <a href="ui-grid.html" class="dropdown-item" data-key="t-grid">Grid</a>
-                                <a href="ui-images.html" class="dropdown-item" data-key="t-images">Images</a>
-                                <a href="ui-modals.html" class="dropdown-item" data-key="t-modals">Modals</a>
-                                <a href="ui-offcanvas.html" class="dropdown-item" data-key="t-offcanvas">Offcanvas</a>
-                              </div>
-                            </div>
-                            <div class="col-lg-5">
-                              <div>
-                                <a href="ui-progressbars.html" class="dropdown-item" data-key="t-progress-bars">Progress Bars</a>
-                                <a href="ui-placeholders.html" class="dropdown-item" data-key="t-progress-bars">Placeholders</a>
-                                <a href="ui-tabs-accordions.html" class="dropdown-item" data-key="t-tabs-accordions">Tabs & Accordions</a>
-                                <a href="ui-typography.html" class="dropdown-item" data-key="t-typography">Typography</a>
-                                <a href="ui-toasts.html" class="dropdown-item" data-key="t-toasts">Toasts</a>
-                                <a href="ui-video.html" class="dropdown-item" data-key="t-video">Video</a>
-                                <a href="ui-general.html" class="dropdown-item" data-key="t-general">General</a>
-                                <a href="ui-colors.html" class="dropdown-item" data-key="t-colors">Colors</a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="col-lg-4">
-                        <div>
-                          <div class="menu-title">Extended</div>
-                          <div>
-                            <a href="extended-lightbox.html" class="dropdown-item" data-key="t-lightbox">Lightbox</a>
-                            <a href="extended-rangeslider.html" class="dropdown-item" data-key="t-range-slider">Range Slider</a>
-                            <a href="extended-sweet-alert.html" class="dropdown-item" data-key="t-sweet-alert">SweetAlert 2</a>
-                            <a href="extended-session-timeout.html" class="dropdown-item" data-key="t-session-timeout">Session Timeout</a>
-                            <a href="extended-rating.html" class="dropdown-item" data-key="t-rating">Rating</a>
-                            <a href="extended-notifications.html" class="dropdown-item" data-key="t-notifications">Notifications</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <li class="nav-item">
+                <%= link_to companies_path, class: "nav-link d-flex align-items-center", data: { turbo: false } do %>
+                  <i class="iconoir-building icon-md me-3"></i><span>Companies</span>
+                <% end %>
               </li>
-
-              <li class="nav-item dropdown" data-mobile-nav-target="dropdown">
-                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-pages" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                  <i class="iconoir-app-window icon-md me-3"></i><span data-key="t-apps">Apps</span>
-                  <div class="arrow-down"></div>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="topnav-pages">
-                  <a href="apps-calendar.html" class="dropdown-item" data-key="t-calendar">Calendar</a>
-                  <a href="apps-chat.html" class="dropdown-item" data-key="t-chat">Chat</a>
-
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-email" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-email">Email</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-email">
-                      <a href="apps-email-inbox.html" class="dropdown-item" data-key="t-inbox">Inbox</a>
-                      <a href="apps-email-read.html" class="dropdown-item" data-key="t-read-email">Read Email</a>
-                    </div>
-                  </div>
-
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-invoice" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-invoices">Invoices</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-invoice">
-                      <a href="apps-invoices-list.html" class="dropdown-item" data-key="t-invoice-list">Invoice List</a>
-                      <a href="apps-invoices-detail.html" class="dropdown-item" data-key="t-invoice-detail">Invoice Detail</a>
-                    </div>
-                  </div>
-
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-contact" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-contacts">Contacts</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-contact">
-                      <a href="apps-contacts-grid.html" class="dropdown-item" data-key="t-user-grid">User Grid</a>
-                      <a href="apps-contacts-list.html" class="dropdown-item" data-key="t-user-list">User List</a>
-                      <a href="apps-contacts-profile.html" class="dropdown-item" data-key="t-profile">Profile</a>
-                    </div>
-                  </div>
-
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-blog" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-blog">Blog</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-blog">
-                      <a href="apps-blog-grid.html" class="dropdown-item" data-key="t-blog-grid">Blog Grid</a>
-                      <a href="apps-blog-list.html" class="dropdown-item" data-key="t-blog-list">Blog List</a>
-                      <a href="apps-blog-detail.html" class="dropdown-item" data-key="t-blog-details">Blog Details</a>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li class="nav-item dropdown" data-mobile-nav-target="dropdown">
-                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-components" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                  <i class="iconoir-packages icon-md me-3"></i><span data-key="t-components">Components</span>
-                  <div class="arrow-down"></div>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="topnav-components">
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-form" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-forms">Forms</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-form">
-                      <a href="form-elements.html" class="dropdown-item" data-key="t-form-elements">Basic Elements</a>
-                      <a href="form-validation.html" class="dropdown-item" data-key="t-form-validation">Validation</a>
-                      <a href="form-advanced.html" class="dropdown-item" data-key="t-form-advanced">Advanced Plugins</a>
-                      <a href="form-editors.html" class="dropdown-item" data-key="t-form-editors">Editors</a>
-                      <a href="form-uploads.html" class="dropdown-item" data-key="t-form-upload">File Upload</a>
-                      <a href="form-wizard.html" class="dropdown-item" data-key="t-form-wizard">Wizard</a>
-                      <a href="form-mask.html" class="dropdown-item" data-key="t-form-mask">Mask</a>
-                    </div>
-                  </div>
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-table" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-tables">Tables</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-table">
-                      <a href="tables-basic.html" class="dropdown-item" data-key="t-basic-tables">Bootstrap Basic</a>
-                      <a href="tables-datatable.html" class="dropdown-item" data-key="t-data-tables">Data Tables</a>
-                      <a href="tables-responsive.html" class="dropdown-item" data-key="t-responsive-table">Responsive</a>
-                      <a href="tables-editable.html" class="dropdown-item" data-key="t-editable-table">Editable</a>
-                    </div>
-                  </div>
-                </div>
+              <li class="nav-item">
+                <%= link_to remote_jobs_path, class: "nav-link d-flex align-items-center", data: { turbo: false } do %>
+                  <i class="iconoir-wifi icon-md me-3"></i><span>Remote Jobs</span>
+                <% end %>
               </li>
             </ul>
           </div>
@@ -192,169 +46,23 @@
 
       <!-- Center Navigation Menu - Desktop Only -->
       <div class="d-none d-lg-flex justify-content-center flex-grow-1">
-        <nav class="navbar navbar-light navbar-expand-lg topnav-menu" data-controller="mobile-nav">
+        <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
           <div class="navbar-collapse" id="topnav-menu-content-desktop">
             <ul class="navbar-nav">
-              <li class="nav-item dropdown" data-mobile-nav-target="dropdown">
-                <%= link_to root_path, class: "nav-link dropdown-toggle arrow-none", id: "topnav-dashboard-desktop", role: "button", "data-bs-toggle": "dropdown", "aria-expanded": "false", data: { 'mobile-nav-target': 'dropdownToggle', turbo: false } do %>
-                  <i class="iconoir-home-simple icon-md"></i><span data-key="t-dashboards">Dashboard</span>
+              <li class="nav-item">
+                <%= link_to jobs_path, class: "nav-link px-4 py-2 mx-2 rounded-3 text-center fw-medium", style: "min-width: 120px;", data: { turbo: false } do %>
+                  <i class="iconoir-briefcase me-1"></i>Browse Jobs
                 <% end %>
-                <div class="dropdown-menu" aria-labelledby="topnav-dashboard-desktop">
-                  <!-- Add dashboard dropdown items if needed -->
-                </div>
               </li>
-
-              <li class="nav-item dropdown" data-mobile-nav-target="dropdown">
-                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-uielement-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                  <i class="iconoir-box icon-md"></i>
-                  <span data-key="t-elements">Elements</span>
-                  <div class="arrow-down"></div>
-                </a>
-                <div class="dropdown-menu mega-dropdown-menu px-2 dropdown-mega-menu-xl" aria-labelledby="topnav-uielement-desktop">
-                  <div class="ps-2 p-lg-0">
-                    <div class="row">
-                      <div class="col-lg-8">
-                        <div>
-                          <div class="menu-title">Elements</div>
-                          <div class="row g-0">
-                            <div class="col-lg-5">
-                              <div>
-                                <a href="ui-alerts.html" class="dropdown-item" data-key="t-alerts">Alerts</a>
-                                <a href="ui-buttons.html" class="dropdown-item" data-key="t-buttons">Buttons</a>
-                                <a href="ui-cards.html" class="dropdown-item" data-key="t-cards">Cards</a>
-                                <a href="ui-carousel.html" class="dropdown-item" data-key="t-carousel">Carousel</a>
-                                <a href="ui-dropdowns.html" class="dropdown-item" data-key="t-dropdowns">Dropdowns</a>
-                                <a href="ui-grid.html" class="dropdown-item" data-key="t-grid">Grid</a>
-                                <a href="ui-images.html" class="dropdown-item" data-key="t-images">Images</a>
-                                <a href="ui-modals.html" class="dropdown-item" data-key="t-modals">Modals</a>
-                                <a href="ui-offcanvas.html" class="dropdown-item" data-key="t-offcanvas">Offcanvas</a>
-                              </div>
-                            </div>
-                            <div class="col-lg-5">
-                              <div>
-                                <a href="ui-progressbars.html" class="dropdown-item" data-key="t-progress-bars">Progress Bars</a>
-                                <a href="ui-placeholders.html" class="dropdown-item" data-key="t-progress-bars">Placeholders</a>
-                                <a href="ui-tabs-accordions.html" class="dropdown-item" data-key="t-tabs-accordions">Tabs & Accordions</a>
-                                <a href="ui-typography.html" class="dropdown-item" data-key="t-typography">Typography</a>
-                                <a href="ui-toasts.html" class="dropdown-item" data-key="t-toasts">Toasts</a>
-                                <a href="ui-video.html" class="dropdown-item" data-key="t-video">Video</a>
-                                <a href="ui-general.html" class="dropdown-item" data-key="t-general">General</a>
-                                <a href="ui-colors.html" class="dropdown-item" data-key="t-colors">Colors</a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="col-lg-4">
-                        <div>
-                          <div class="menu-title">Extended</div>
-                          <div>
-                            <a href="extended-lightbox.html" class="dropdown-item" data-key="t-lightbox">Lightbox</a>
-                            <a href="extended-rangeslider.html" class="dropdown-item" data-key="t-range-slider">Range Slider</a>
-                            <a href="extended-sweet-alert.html" class="dropdown-item" data-key="t-sweet-alert">SweetAlert 2</a>
-                            <a href="extended-session-timeout.html" class="dropdown-item" data-key="t-session-timeout">Session Timeout</a>
-                            <a href="extended-rating.html" class="dropdown-item" data-key="t-rating">Rating</a>
-                            <a href="extended-notifications.html" class="dropdown-item" data-key="t-notifications">Notifications</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <li class="nav-item">
+                <%= link_to companies_path, class: "nav-link px-4 py-2 mx-2 rounded-3 text-center fw-medium", style: "min-width: 120px;", data: { turbo: false } do %>
+                  <i class="iconoir-building me-1"></i>Companies
+                <% end %>
               </li>
-
-              <li class="nav-item dropdown" data-mobile-nav-target="dropdown">
-                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-pages-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                  <i class="iconoir-app-window icon-md"></i><span data-key="t-apps">Apps</span>
-                  <div class="arrow-down"></div>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="topnav-pages-desktop">
-                  <a href="apps-calendar.html" class="dropdown-item" data-key="t-calendar">Calendar</a>
-                  <a href="apps-chat.html" class="dropdown-item" data-key="t-chat">Chat</a>
-
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-email-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-email">Email</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-email-desktop">
-                      <a href="apps-email-inbox.html" class="dropdown-item" data-key="t-inbox">Inbox</a>
-                      <a href="apps-email-read.html" class="dropdown-item" data-key="t-read-email">Read Email</a>
-                    </div>
-                  </div>
-
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-invoice-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-invoices">Invoices</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-invoice-desktop">
-                      <a href="apps-invoices-list.html" class="dropdown-item" data-key="t-invoice-list">Invoice List</a>
-                      <a href="apps-invoices-detail.html" class="dropdown-item" data-key="t-invoice-detail">Invoice Detail</a>
-                    </div>
-                  </div>
-
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-contact-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-contacts">Contacts</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-contact-desktop">
-                      <a href="apps-contacts-grid.html" class="dropdown-item" data-key="t-user-grid">User Grid</a>
-                      <a href="apps-contacts-list.html" class="dropdown-item" data-key="t-user-list">User List</a>
-                      <a href="apps-contacts-profile.html" class="dropdown-item" data-key="t-profile">Profile</a>
-                    </div>
-                  </div>
-
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-blog-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-blog">Blog</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-blog-desktop">
-                      <a href="apps-blog-grid.html" class="dropdown-item" data-key="t-blog-grid">Blog Grid</a>
-                      <a href="apps-blog-list.html" class="dropdown-item" data-key="t-blog-list">Blog List</a>
-                      <a href="apps-blog-detail.html" class="dropdown-item" data-key="t-blog-details">Blog Details</a>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li class="nav-item dropdown" data-mobile-nav-target="dropdown">
-                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-components-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                  <i class="iconoir-packages icon-md"></i><span data-key="t-components">Components</span>
-                  <div class="arrow-down"></div>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="topnav-components-desktop">
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-form-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-forms">Forms</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-form-desktop">
-                      <a href="form-elements.html" class="dropdown-item" data-key="t-form-elements">Basic Elements</a>
-                      <a href="form-validation.html" class="dropdown-item" data-key="t-form-validation">Validation</a>
-                      <a href="form-advanced.html" class="dropdown-item" data-key="t-form-advanced">Advanced Plugins</a>
-                      <a href="form-editors.html" class="dropdown-item" data-key="t-form-editors">Editors</a>
-                      <a href="form-uploads.html" class="dropdown-item" data-key="t-form-upload">File Upload</a>
-                      <a href="form-wizard.html" class="dropdown-item" data-key="t-form-wizard">Wizard</a>
-                      <a href="form-mask.html" class="dropdown-item" data-key="t-form-mask">Mask</a>
-                    </div>
-                  </div>
-                  <div class="dropdown" data-mobile-nav-target="dropdown">
-                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-table-desktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-mobile-nav-target="dropdownToggle">
-                      <span data-key="t-tables">Tables</span>
-                      <div class="arrow-down"></div>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="topnav-table-desktop">
-                      <a href="tables-basic.html" class="dropdown-item" data-key="t-basic-tables">Bootstrap Basic</a>
-                      <a href="tables-datatable.html" class="dropdown-item" data-key="t-data-tables">Data Tables</a>
-                      <a href="tables-responsive.html" class="dropdown-item" data-key="t-responsive-table">Responsive</a>
-                      <a href="tables-editable.html" class="dropdown-item" data-key="t-editable-table">Editable</a>
-                    </div>
-                  </div>
-                </div>
+              <li class="nav-item">
+                <%= link_to remote_jobs_path, class: "nav-link px-4 py-2 mx-2 rounded-3 text-center fw-medium", style: "min-width: 120px;", data: { turbo: false } do %>
+                  <i class="iconoir-wifi me-1"></i>Remote Jobs
+                <% end %>
               </li>
             </ul>
           </div>
@@ -388,12 +96,12 @@
                   <span class="badge bg-warning ms-1">Unverified</span>
                 <% end %>
               </h6>
-              <%= link_to profile_path, class: "dropdown-item d-flex align-items-center", data: { turbo: false } do %>
+              <%= link_to profile_path, class: "dropdown-item d-flex align-items-center" do %>
                 <i class="mdi mdi-face-man icon-md me-2"></i> Profile
               <% end %>
               <% unless current_user.email_verified? %>
                 <div class="dropdown-divider"></div>
-                <%= link_to auth_resend_email_path, method: :post, class: "dropdown-item d-flex align-items-center", data: { confirm: "Resend email verification?", turbo: false } do %>
+                <%= link_to auth_resend_email_path, method: :post, class: "dropdown-item d-flex align-items-center", data: { confirm: "Resend email verification?" } do %>
                   <i class="mdi mdi-email-outline icon-md me-2"></i> Verify Email
                 <% end %>
               <% end %>

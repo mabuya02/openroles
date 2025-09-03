@@ -335,7 +335,6 @@ body[data-layout=horizontal] .navbar-brand-box {
 }
 
 body[data-layout=horizontal] .page-content {
-    margin-top: 1px;
     padding: calc(55px + 1.5rem) calc(1.5rem / 2) 60px calc(1.5rem / 2)
 }
 
@@ -352,11 +351,7 @@ body[data-layout=horizontal][data-sidebar=dark] .navbar-brand-box {
     box-shadow: none
 }
 
-@media (max-width:992px) {
-    body[data-layout=horizontal] .page-content {
-        margin-top: 2px
-    }
-}
+
 
 .page-title-box {
     padding-bottom: 1.5rem

@@ -1,0 +1,229 @@
+<% content_for :title, "Companies - Discover Great Places to Work" %>
+<% content_for :description, "Explore top companies and find your ideal workplace. Browse companies by industry, location, and size to discover amazing career opportunities." %>
+
+<!-- Hero Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-success-subtle rounded-3 p-4 text-center">
+      <div class="d-inline-flex align-items-center justify-content-center bg-success rounded-circle mb-3" style="width: 60px; height: 60px;">
+        <i class="iconoir-building fs-3 text-white"></i>
+      </div>
+      <h2 class="fw-bold text-dark mb-2">Discover Amazing Companies</h2>
+      <p class="text-muted mb-0 fs-16">Explore <%= @pagy ? @pagy.count : @companies.size %> innovative companies and find your perfect workplace</p>
+    </div>
+  </div>
+</div>
+
+    <!-- Advanced Search -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <%= form_with url: search_companies_path, method: :get, local: true, class: "row g-3" do |f| %>
+              <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="iconoir-search text-muted"></i>
+                  </span>
+                  <%= f.text_field :q, placeholder: "Company name or description", 
+                      value: params[:q], class: "form-control border-start-0 ps-0", 
+                      id: "company-search-input" %>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="iconoir-pin-alt text-muted"></i>
+                  </span>
+                  <%= f.text_field :location, placeholder: "Location", 
+                      value: params[:location], class: "form-control border-start-0 ps-0",
+                      id: "company-location-search-input" %>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <%= f.select :industry, 
+                    options_for_select([
+                      ['All Industries', '']
+                    ] + (@featured_industries || []).map { |industry| [industry, industry] }, params[:industry]),
+                    {}, { class: "form-select" } %>
+              </div>
+              <div class="col-md-2">
+                <%= f.select :has_jobs,
+                    options_for_select([
+                      ['All Companies', ''],
+                      ['Currently Hiring', 'true']
+                    ], params[:has_jobs]),
+                    {}, { class: "form-select" } %>
+              </div>
+              <div class="col-md-1">
+                <%= f.submit "Search", class: "btn btn-primary w-100" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Companies List -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="card-title mb-0">
+              <%= @pagy ? "#{@pagy.count} Companies" : "All Companies" %>
+            </h5>
+            <div class="flex-shrink-0">
+              <select class="form-select form-select-sm" id="sort-select">
+                <option value="name">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="jobs-desc">Most Jobs</option>
+                <option value="newest">Newest</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <% if @companies.present? %>
+              <div class="row g-0">
+                <% @companies.each do |company| %>
+                  <div class="col-md-6 col-lg-4">
+                    <div class="border company-card h-100" data-company-id="<%= company.id %>">
+                      <div class="p-4">
+                        <div class="text-center mb-3">
+                          <div class="avatar-lg mx-auto mb-3">
+                            <div class="avatar-title bg-light text-primary rounded-3 fs-2">
+                              <i class="iconoir-building"></i>
+                            </div>
+                          </div>
+                          <h5 class="fs-16 mb-2">
+                            <%= link_to company.name, company_path(company), 
+                                class: "text-dark text-decoration-none company-name-link",
+                                data: { turbo: false } %>
+                          </h5>
+                          <% if company.industry.present? %>
+                            <p class="text-muted mb-2 fs-13"><%= company.industry %></p>
+                          <% end %>
+                          <% if company.location.present? %>
+                            <p class="text-muted mb-3 fs-13">
+                              <i class="iconoir-map-pin me-1"></i><%= company.location %>
+                            </p>
+                          <% end %>
+                        </div>
+
+                        <% if company.industry.present? %>
+                          <p class="text-muted fs-13 mb-3" style="min-height: 60px;">
+                            <i class="iconoir-category me-2"></i><%= company.industry %>
+                          </p>
+                        <% else %>
+                          <p class="text-muted fs-13 mb-3" style="min-height: 60px;">
+                            <i class="iconoir-building me-2"></i>Company in various industries
+                          </p>
+                        <% end %>
+
+                        <!-- Company Stats -->
+                        <div class="row text-center mb-3">
+                          <div class="col-6">
+                            <h6 class="fw-bold text-primary mb-0">
+                              <%= company.respond_to?(:jobs_count) ? company.jobs_count : company.jobs.published.count %>
+                            </h6>
+                            <p class="text-muted mb-0 fs-12">Open Jobs</p>
+                          </div>
+                          <div class="col-6">
+                            <h6 class="fw-bold text-primary mb-0">
+                              <%= company.website.present? ? 'Yes' : 'No' %>
+                            </h6>
+                            <p class="text-muted mb-0 fs-12">Website</p>
+                          </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                          <%= link_to "View Profile", company_path(company), 
+                              class: "btn btn-primary btn-sm flex-fill",
+                              data: { turbo: false } %>
+                          <% if company.jobs.published.any? %>
+                            <%= link_to "View Jobs", jobs_company_path(company), 
+                                class: "btn btn-outline-primary btn-sm flex-fill",
+                                data: { turbo: false } %>
+                          <% end %>
+                        </div>
+
+                        <% if company.website.present? %>
+                          <div class="d-flex justify-content-center gap-3 mt-3">
+                            <%= link_to company.website, class: "text-muted", target: "_blank", rel: "noopener" do %>
+                              <i class="iconoir-internet"></i>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-center py-5">
+                <div class="avatar-lg mx-auto mb-4">
+                  <div class="avatar-title bg-light text-muted rounded-circle fs-1">
+                    <i class="iconoir-search"></i>
+                  </div>
+                </div>
+                <h5 class="mb-3">No Companies Found</h5>
+                <p class="text-muted mb-4">
+                  We couldn't find any companies matching your criteria. Try adjusting your search filters.
+                </p>
+                <%= link_to "Browse All Companies", companies_path, class: "btn btn-primary", data: { turbo: false } %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <% if defined?(@pagy) && @pagy %>
+      <div class="row">
+        <div class="col-12">
+          <div class="text-center">
+            <%== pagy_bootstrap_nav_no_turbo(@pagy) %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Featured Industries -->
+    <% if @featured_industries.present? %>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Popular Industries</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex flex-wrap gap-2">
+                <% @featured_industries.each do |industry| %>
+                  <%= link_to companies_path(industry: industry), 
+                      class: "badge bg-secondary-subtle text-secondary fs-13 px-3 py-2 text-decoration-none",
+                      data: { turbo: false } do %>
+                    <%= industry %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+<style>
+.company-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.company-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.company-name-link:hover {
+  color: var(--bs-primary) !important;
+}
+</style>

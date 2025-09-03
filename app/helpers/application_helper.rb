@@ -1,4 +1,7 @@
 module ApplicationHelper
+  # Include Pagy helpers for pagination views
+  include Pagy::Frontend
+
   # Create alert flash messages with custom options
   def flash_alert(message, type = :info, options = {})
     duration = options[:duration] || 4000

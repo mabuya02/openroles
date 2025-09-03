@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_01_124703) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_01_204413) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -145,6 +145,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_124703) do
     t.decimal "salary_min", precision: 12, scale: 2
     t.decimal "salary_max", precision: 12, scale: 2
     t.tsvector "search_vector"
+    t.string "currency", default: "USD", null: false
     t.index ["company_id"], name: "index_jobs_on_company_id"
     t.index ["description"], name: "index_jobs_on_description_trgm", opclass: :gin_trgm_ops, using: :gin
     t.index ["fingerprint"], name: "index_jobs_on_fingerprint", unique: true, where: "(fingerprint IS NOT NULL)"

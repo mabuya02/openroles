@@ -9,6 +9,71 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
+/* Turbo Loading States */
+.turbo-loading {
+  cursor: progress !important;
+}
+
+.turbo-loading * {
+  pointer-events: none;
+}
+
+/* Smooth transitions for page changes */
+body {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.turbo-loading body {
+  opacity: 0.9;
+}
+
+/* Loading indicator */
+.turbo-progress-bar {
+  position: fixed;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: #0d6efd;
+  z-index: 2000;
+  transition: width 300ms ease-out, opacity 150ms 150ms ease-in;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Page transition animations */
+.page-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Improved button interactions */
+.btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Card hover effects */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
 /* Fix dropdown z-index issues */
 #page-topbar .dropdown-menu {
   z-index: 1050 !important;
