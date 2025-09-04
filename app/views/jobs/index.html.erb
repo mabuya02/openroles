@@ -70,17 +70,9 @@
             <div class="card-header bg-white border-bottom">
               <div class="d-flex align-items-center justify-content-between">
                 <h5 class="card-title mb-0 d-flex align-items-center">
-                  <i class="iconoir-briefcase me-2 text-primary"></i>
+
                   <%= @pagy ? "#{@pagy.count} Jobs Found" : "Latest Jobs" %>
                 </h5>
-                <div class="flex-shrink-0">
-                  <select class="form-select form-select-sm border-0 bg-light" id="sort-select">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="salary-high">Salary: High to Low</option>
-                    <option value="salary-low">Salary: Low to High</option>
-                  </select>
-                </div>
               </div>
             </div>
             <div class="card-body p-0">
