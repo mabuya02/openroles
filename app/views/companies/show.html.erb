@@ -221,11 +221,11 @@
 <div class="row">
   <!-- Company Jobs -->
   <div class="col-lg-8">
-    <div class="card border-0 shadow-sm">
+    <div class="card border-0 shadow-sm mb-4">
       <div class="card-header bg-white border-bottom">
         <div class="d-flex align-items-center justify-content-between">
           <h5 class="card-title mb-0">
-            <i class="iconoir-briefcase me-2 text-primary"></i>
+            <i class="iconoir-suitcase me-2 text-primary"></i>
             Open Positions
           </h5>
           <% if @company.jobs.published.count > 0 %>
@@ -296,229 +296,202 @@
         <% end %>
       </div>
     </div>
+
+    <!-- Similar Companies Grid -->
+    <% if defined?(@similar_companies) && @similar_companies.present? %>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="card-title mb-0">
+            <i class="iconoir-building me-2 text-primary"></i>
+            Similar Companies
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <% @similar_companies.each do |company| %>
+              <div class="col-md-6">
+                <div class="p-3 border rounded hover-bg-light h-100">
+                  <div class="d-flex align-items-start">
+                    <div class="avatar-md me-3 flex-shrink-0">
+                      <% if company.logo_url.present? %>
+                        <%= image_tag company.logo_url, alt: company.name, class: "rounded img-fluid", style: "width: 48px; height: 48px; object-fit: cover;" %>
+                      <% else %>
+                        <div class="avatar-title bg-light text-primary rounded fs-20">
+                          <i class="iconoir-building m3 2"></i>
+                        </div>
+                      <% end %>
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                      <h6 class="mb-1 fs-15 fw-medium">
+                        <%= link_to company.name, company_path(company), class: "text-dark text-decoration-none text-truncate d-block", data: { turbo: false } %>
+                      </h6>
+                      <p class="text-muted mb-2 fs-13">
+                        <i class="iconoir-briefcase me-1"></i>
+                        <%= pluralize(company.jobs.published.count, 'job') %>
+                        <% if company.industry.present? %>
+                          <br><i class="iconoir-suitcase me-1"></i><%= company.industry %>
+                        <% end %>
+                      </p>
+                      <% if company.location.present? %>
+                        <p class="text-muted mb-0 fs-12">
+                          <i class="iconoir-map-pin me-1"></i>
+                          <%= company.location %>
+                        </p>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
   
   <!-- Company Sidebar -->
   <div class="col-lg-4">
-    <!-- Quick Company Overview -->
+
+
+    <!-- Recent Job Postings -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-bottom">
+        <h6 class="card-title mb-0">
+          <i class="iconoir-clock me-1 text-primary"></i>
+          Recent Job Postings
+        </h6>
+      </div>
+      <div class="card-body p-0">
+        <% recent_jobs = @company.jobs.published.order(created_at: :desc).limit(5) %>
+        <% if recent_jobs.any? %>
+          <% recent_jobs.each_with_index do |job, index| %>
+            <div class="p-3 <%= 'border-bottom' if index < recent_jobs.size - 1 %> hover-bg-light">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="mb-1 fs-14 fw-medium">
+                  <%= link_to job.title, job_path(job), class: "text-dark text-decoration-none", data: { turbo: false } %>
+                </h6>
+                <% if job.remote_friendly? %>
+                  <span class="badge bg-success-subtle text-success fs-12">
+                    <i class="iconoir-wifi"></i>
+                  </span>
+                <% end %>
+              </div>
+              <div class="text-muted fs-13 mb-2">
+                <% if job.employment_type.present? %>
+                  <i class="iconoir-timer me-1"></i><%= job.employment_type.humanize %>
+                <% end %>
+                <% if job.location.present? %>
+                  <br><i class="iconoir-map-pin me-1"></i><%= job.location %>
+                <% end %>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                  <i class="iconoir-calendar me-1"></i>
+                  <%= time_ago_in_words(job.created_at) %> ago
+                </small>
+                <%= link_to job_path(job), class: "btn btn-outline-primary btn-sm", data: { turbo: false } do %>
+                  <i class="iconoir-eye me-1"></i>View
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+          
+          <% if @company.jobs.published.count > 5 %>
+            <div class="p-3 text-center border-top bg-light">
+              <%= link_to jobs_company_path(@company), class: "btn btn-primary btn-sm", data: { turbo: false } do %>
+                <i class="iconoir-briefcase me-1"></i>
+                View All <%= @company.jobs.published.count %> Jobs
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="text-center py-4">
+            <div class="avatar-md mx-auto mb-3">
+              <div class="avatar-title bg-light text-muted rounded-circle">
+                <i class="iconoir-briefcase"></i>
+              </div>
+            </div>
+            <p class="text-muted mb-0 fs-14">No recent job postings</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Company Quick Info -->
     <div class="card border-0 shadow-sm mb-4">
       <div class="card-header bg-white border-bottom">
         <h6 class="card-title mb-0">
           <i class="iconoir-info-circle me-1 text-primary"></i>
-          Company Overview
+          Quick Info
         </h6>
       </div>
       <div class="card-body">
-        <div class="text-center mb-3">
-          <% if @company.logo_url.present? %>
-            <%= image_tag @company.logo_url, alt: @company.name, class: "rounded-3 img-fluid mb-3", style: "width: 80px; height: 80px; object-fit: cover;" %>
-          <% else %>
-            <div class="avatar-xl mx-auto mb-3 bg-light rounded-3 d-flex align-items-center justify-content-center">
-              <i class="iconoir-building fs-1 text-primary"></i>
-            </div>
-          <% end %>
-          <h5 class="mb-1 fw-bold"><%= @company.name %></h5>
-          <% if @company.industry.present? %>
-            <span class="badge bg-primary-subtle text-primary fs-12">
-              <%= @company.industry.humanize %>
-            </span>
-          <% end %>
+        <div class="quick-info-item mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-14 text-muted">Industry</span>
+            <% if @company.industry.present? %>
+              <span class="badge bg-primary-subtle text-primary fs-13">
+                <%= @company.industry.humanize %>
+              </span>
+            <% else %>
+              <span class="text-muted fs-13">Not specified</span>
+            <% end %>
+          </div>
         </div>
 
-        <div class="company-stats mb-3">
-          <div class="row text-center">
-            <div class="col-6">
-              <div class="border-end">
-                <h4 class="fw-bold text-primary mb-1">
-                  <%= @company.jobs.published.count %>
-                </h4>
-                <p class="text-muted mb-0 fs-12">Open Jobs</p>
-              </div>
-            </div>
-            <div class="col-6">
-              <h4 class="fw-bold text-success mb-1">
-                <%= @company.jobs.published.select(&:remote_friendly?).count %>
-              </h4>
-              <p class="text-muted mb-0 fs-12">Remote</p>
-            </div>
+        <div class="quick-info-item mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-14 text-muted">Location</span>
+            <span class="fs-13">
+              <% if @company.location.present? %>
+                <i class="iconoir-map-pin me-1"></i><%= @company.location %>
+              <% else %>
+                <span class="text-muted">Not specified</span>
+              <% end %>
+            </span>
+          </div>
+        </div>
+
+        <div class="quick-info-item mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-14 text-muted">Total Jobs</span>
+            <span class="fw-bold text-primary fs-14"><%= @company.jobs.count %></span>
+          </div>
+        </div>
+
+        <div class="quick-info-item mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-14 text-muted">Active Jobs</span>
+            <span class="fw-bold text-success fs-14"><%= @company.jobs.published.count %></span>
+          </div>
+        </div>
+
+        <div class="quick-info-item mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-14 text-muted">Remote Jobs</span>
+            <span class="fw-bold text-info fs-14"><%= @company.jobs.published.select(&:remote_friendly?).count %></span>
+          </div>
+        </div>
+
+        <div class="quick-info-item mb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-14 text-muted">Member Since</span>
+            <span class="fs-13">
+              <i class="iconoir-calendar me-1"></i>
+              <%= @company.created_at.strftime("%b %Y") %>
+            </span>
           </div>
         </div>
 
         <% if @company.website.present? %>
-          <div class="d-grid mb-3">
-            <%= link_to @company.website, target: "_blank", rel: "noopener", class: "btn btn-outline-primary btn-sm" do %>
-              <i class="iconoir-internet me-1"></i>Visit Website
-              <i class="iconoir-arrow-up-right ms-1 fs-12"></i>
+          <div class="mt-4 pt-3 border-top">
+            <%= link_to @company.website, target: "_blank", rel: "noopener", class: "btn btn-outline-primary btn-sm w-100" do %>
+              <i class="iconoir-internet me-1"></i>Visit Company Website
             <% end %>
           </div>
         <% end %>
       </div>
     </div>
-
-    <!-- Detailed Company Information -->
-    <div class="card border-0 shadow-sm mb-4">
-      <div class="card-header bg-white border-bottom">
-        <h6 class="card-title mb-0">
-          <i class="iconoir-bookmark me-1 text-primary"></i>
-          Company Details
-        </h6>
-      </div>
-      <div class="card-body">
-        <div class="company-detail-item mb-3">
-          <label class="form-label fs-13 text-muted mb-1 fw-medium">COMPANY NAME</label>
-          <p class="mb-0 fs-14"><%= @company.name %></p>
-        </div>
-
-        <% if @company.industry.present? %>
-          <div class="company-detail-item mb-3">
-            <label class="form-label fs-13 text-muted mb-1 fw-medium">INDUSTRY</label>
-            <p class="mb-0 fs-14">
-              <span class="badge bg-secondary-subtle text-secondary">
-                <%= @company.industry.humanize %>
-              </span>
-            </p>
-          </div>
-        <% end %>
-        
-        <% if @company.location.present? %>
-          <div class="company-detail-item mb-3">
-            <label class="form-label fs-13 text-muted mb-1 fw-medium">HEADQUARTERS</label>
-            <p class="mb-0 fs-14">
-              <i class="iconoir-map-pin me-1 text-muted"></i>
-              <%= @company.location %>
-            </p>
-          </div>
-        <% end %>
-        
-        <div class="company-detail-item mb-3">
-          <label class="form-label fs-13 text-muted mb-1 fw-medium">MEMBER SINCE</label>
-          <p class="mb-0 fs-14">
-            <i class="iconoir-calendar me-1 text-muted"></i>
-            <%= @company.created_at.strftime("%B %d, %Y") %>
-            <span class="text-muted fs-12">(<%= time_ago_in_words(@company.created_at) %> ago)</span>
-          </p>
-        </div>
-
-        <div class="company-detail-item mb-3">
-          <label class="form-label fs-13 text-muted mb-1 fw-medium">LAST UPDATED</label>
-          <p class="mb-0 fs-14">
-            <i class="iconoir-refresh me-1 text-muted"></i>
-            <%= @company.updated_at.strftime("%B %d, %Y") %>
-            <% if @company.updated_at > 30.days.ago %>
-              <span class="badge bg-success-subtle text-success fs-12 ms-1">Recent</span>
-            <% end %>
-          </p>
-        </div>
-
-        <div class="company-detail-item mb-3">
-          <label class="form-label fs-13 text-muted mb-1 fw-medium">COMPANY STATUS</label>
-          <p class="mb-0 fs-14">
-            <span class="badge bg-success-subtle text-success">
-              <i class="iconoir-check-circle me-1"></i>
-              <%= @company.status.humanize %>
-            </span>
-          </p>
-        </div>
-
-        <% if @company.slug.present? %>
-          <div class="company-detail-item mb-0">
-            <label class="form-label fs-13 text-muted mb-1 fw-medium">COMPANY ID</label>
-            <p class="mb-0 fs-14">
-              <code class="fs-12 bg-light px-2 py-1 rounded"><%= @company.slug %></code>
-            </p>
-          </div>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Job Statistics -->
-    <div class="card border-0 shadow-sm mb-4">
-      <div class="card-header bg-white border-bottom">
-        <h6 class="card-title mb-0">
-          <i class="iconoir-stats-report me-1 text-primary"></i>
-          Job Statistics
-        </h6>
-      </div>
-      <div class="card-body">
-        <div class="stat-item mb-3">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="fs-14 text-muted">Total Jobs Posted</span>
-            <span class="fw-bold text-primary"><%= @company.jobs.count %></span>
-          </div>
-          <div class="progress" style="height: 4px;">
-            <div class="progress-bar bg-primary" style="width: 100%"></div>
-          </div>
-        </div>
-
-        <div class="stat-item mb-3">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="fs-14 text-muted">Active Openings</span>
-            <span class="fw-bold text-success"><%= @company.jobs.published.count %></span>
-          </div>
-          <div class="progress" style="height: 4px;">
-            <div class="progress-bar bg-success" style="width: <%= @company.jobs.count > 0 ? (@company.jobs.published.count.to_f / @company.jobs.count * 100).round : 0 %>%"></div>
-          </div>
-        </div>
-
-        <div class="stat-item mb-3">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="fs-14 text-muted">Remote Positions</span>
-            <span class="fw-bold text-info"><%= @company.jobs.published.select(&:remote_friendly?).count %></span>
-          </div>
-          <div class="progress" style="height: 4px;">
-            <div class="progress-bar bg-info" style="width: <%= @company.jobs.published.count > 0 ? (@company.jobs.published.select(&:remote_friendly?).count.to_f / @company.jobs.published.count * 100).round : 0 %>%"></div>
-          </div>
-        </div>
-
-        <% recent_jobs = @company.jobs.where('created_at > ?', 30.days.ago).count %>
-        <div class="stat-item mb-0">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="fs-14 text-muted">Recent Jobs (30d)</span>
-            <span class="fw-bold text-warning"><%= recent_jobs %></span>
-          </div>
-          <div class="progress" style="height: 4px;">
-            <div class="progress-bar bg-warning" style="width: <%= @company.jobs.count > 0 ? (recent_jobs.to_f / @company.jobs.count * 100).round : 0 %>%"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Similar Companies -->
-    <% if defined?(@similar_companies) && @similar_companies.present? %>
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom">
-          <h6 class="card-title mb-0">Similar Companies</h6>
-        </div>
-        <div class="card-body p-0">
-          <% @similar_companies.each_with_index do |company, index| %>
-            <div class="p-3 <%= 'border-bottom' if index < @similar_companies.size - 1 %> hover-bg-light">
-              <div class="d-flex align-items-center">
-                <div class="avatar-sm me-3">
-                  <% if company.logo_url.present? %>
-                    <%= image_tag company.logo_url, alt: company.name, class: "rounded img-fluid", style: "width: 40px; height: 40px; object-fit: cover;" %>
-                  <% else %>
-                    <div class="avatar-title bg-light text-primary rounded fs-16">
-                      <i class="iconoir-building"></i>
-                    </div>
-                  <% end %>
-                </div>
-                <div class="flex-grow-1">
-                  <h6 class="mb-1 fs-14">
-                    <%= link_to company.name, company_path(company), class: "text-dark text-decoration-none", data: { turbo: false } %>
-                  </h6>
-                  <p class="text-muted mb-0 fs-12">
-                    <%= pluralize(company.jobs.published.count, 'job') %>
-                    <% if company.industry.present? %>
-                      • <%= company.industry %>
-                    <% end %>
-                  </p>
-                </div>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
   </div>
 </div>
 
@@ -531,6 +504,11 @@
   .avatar-lg {
     width: 64px;
     height: 64px;
+  }
+
+  .avatar-md {
+    width: 48px;
+    height: 48px;
   }
 
   .avatar-xl {
@@ -566,25 +544,21 @@
     padding-bottom: 0;
   }
 
-  .stat-item {
-    padding: 12px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border-radius: 8px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  .quick-info-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f8f9fa;
+    transition: background-color 0.2s ease;
   }
 
-  .stat-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  .quick-info-item:last-child {
+    border-bottom: none;
   }
 
-  .progress {
+  .quick-info-item:hover {
+    background-color: rgba(0, 123, 255, 0.02);
     border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .progress-bar {
-    transition: width 0.6s ease;
+    margin: 0 -8px;
+    padding: 8px;
   }
 
   .card {
@@ -608,10 +582,6 @@
   @media (max-width: 768px) {
     .company-info-item {
       margin-bottom: 20px;
-    }
-
-    .stat-item {
-      margin-bottom: 15px;
     }
   }
 </style>

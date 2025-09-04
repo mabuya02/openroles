@@ -73,14 +73,6 @@
             <h5 class="card-title mb-0">
               <%= @pagy ? "#{@pagy.count} Remote Jobs Found" : "Latest Remote Jobs" %>
             </h5>
-            <div class="flex-shrink-0">
-              <select class="form-select form-select-sm" id="sort-select">
-                <option value="newest">Newest First</option>
-                <option value="salary-high">Salary: High to Low</option>
-                <option value="salary-low">Salary: Low to High</option>
-                <option value="company">Company A-Z</option>
-              </select>
-            </div>
           </div>
           <div class="card-body p-0">
             <% if @jobs.present? %>
@@ -93,7 +85,7 @@
                           <div class="flex-shrink-0">
                             <div class="avatar-md">
                               <div class="avatar-title bg-success-subtle text-success rounded-3 fs-3">
-                                <i class="iconoir-home-wifi"></i>
+                                <i class="iconoir-wifi"></i>
                               </div>
                             </div>
                           </div>
@@ -103,7 +95,7 @@
                                   class: "text-dark text-decoration-none remote-job-title-link",
                                   data: { turbo: false } %>
                               <span class="badge bg-success-subtle text-success ms-2">
-                                <i class="iconoir-home-wifi me-1"></i>Remote
+                                <i class="iconoir-wifi me-1"></i>Remote
                               </span>
                             </h5>
                             <p class="text-muted mb-2">
@@ -166,7 +158,7 @@
                             <%= link_to job.apply_url, 
                                 class: "btn btn-outline-success btn-sm",
                                 target: "_blank", rel: "noopener" do %>
-                              <i class="iconoir-external-link me-1"></i>Apply Remote
+                              <i class="iconoir-open-select-hand-gesture me-1"></i>Apply Remote
                             <% end %>
                           <% end %>
                         </div>

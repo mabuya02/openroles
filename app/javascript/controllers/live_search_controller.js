@@ -12,10 +12,16 @@ export default class extends Controller {
     this.timeout = null
     this.currentQuery = ""
     this.hideResults()
+    
+    // Bind the outside click handler
+    this.boundHandleOutsideClick = this.handleOutsideClick.bind(this)
+    document.addEventListener('click', this.boundHandleOutsideClick)
   }
 
   disconnect() {
     this.clearTimeout()
+    // Remove the outside click listener
+    document.removeEventListener('click', this.boundHandleOutsideClick)
   }
 
   input(event) {
@@ -235,23 +241,26 @@ export default class extends Controller {
     return div.innerHTML
   }
 
-  // Hide results when clicking outside
+  // Handle outside clicks to hide results
   handleOutsideClick(event) {
     if (!this.element.contains(event.target)) {
       this.hideResults()
     }
   }
 
-  // Setup global click listener
-  static afterLoad() {
-    document.addEventListener('click', (event) => {
-      const liveSearchControllers = document.querySelectorAll('[data-controller*="live-search"]')
-      liveSearchControllers.forEach(element => {
-        const controller = this.getControllerForElement(element)
-        if (controller && !element.contains(event.target)) {
-          controller.hideResults()
-        }
-      })
-    })
+  connect() {
+    this.timeout = null
+    this.currentQuery = ""
+    this.hideResults()
+    
+    // Bind the outside click handler
+    this.boundHandleOutsideClick = this.handleOutsideClick.bind(this)
+    document.addEventListener('click', this.boundHandleOutsideClick)
+  }
+
+  disconnect() {
+    this.clearTimeout()
+    // Remove the outside click listener
+    document.removeEventListener('click', this.boundHandleOutsideClick)
   }
 }

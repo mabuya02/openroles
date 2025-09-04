@@ -7,8 +7,6 @@ class User < ApplicationRecord
   has_many :verification_codes, dependent: :destroy
   has_many :applications, dependent: :destroy
   has_many :alerts, dependent: :destroy
-  has_many :saved_jobs, dependent: :destroy
-  has_many :jobs, through: :saved_jobs
   has_many :applied_jobs, through: :applications, source: :job
 
   # Status constants from UserStatus enum

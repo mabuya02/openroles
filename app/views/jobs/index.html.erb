@@ -145,16 +145,14 @@
                           </div>
                         </div>
                         <div class="col-md-4 text-md-end">
-                          <p class="text-muted mb-3 fs-13">
-                            <i class="iconoir-clock me-1"></i>
-                            <%= time_ago_in_words(job.created_at) %> ago
-                          </p>
-                          <div class="d-flex flex-md-column flex-row gap-2 justify-content-md-end">
+
+                          <div class="d-flex flex-wrap gap-2 justify-content-md-end mb-3">
                             <%= link_to job_path(job), 
                                 class: "btn btn-primary btn-sm",
                                 data: { turbo: false } do %>
                               <i class="iconoir-eye me-1"></i>View Job
                             <% end %>
+                            
                             <% if job.apply_url.present? %>
                               <%= link_to job.apply_url, 
                                   class: "btn btn-outline-success btn-sm",
@@ -163,6 +161,10 @@
                               <% end %>
                             <% end %>
                           </div>
+                          <p class="text-muted fs-13">
+                            <i class="iconoir-clock me-1"></i>
+                            <%= time_ago_in_words(job.created_at) %> ago
+                          </p>
                         </div>
                       </div>
                     </div>
