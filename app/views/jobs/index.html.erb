@@ -1,5 +1,5 @@
 <% content_for :title, "Browse Jobs - Find Your Next Opportunity" %>
-<% content_for :description, "Explore thousands of job opportunities from top companies. Filter by location, salary, employment type, and skills to find your perfect match." %>
+<% content_for :description, "Explore thousands of job opportunities from top companies. Filter by location and keywords to find your perfect match." %>
 
 <!-- Hero Section -->
 <div class="row mb-4">
@@ -14,67 +14,54 @@
   </div>
 </div>
 
-    <!-- Advanced Search -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-body">
-            <%= form_with url: search_jobs_path, method: :get, local: true, class: "row g-3" do |f| %>
-              <div class="col-md-4">
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0">
-                    <i class="iconoir-search text-muted"></i>
-                  </span>
-                  <%= f.text_field :q, placeholder: "Job title, keywords, or company", 
-                      value: params[:q], class: "form-control border-start-0 ps-0", 
-                      id: "job-search-input" %>
-                </div>
+<!-- Advanced Search -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <%= form_with url: search_jobs_path, method: :get, local: true, class: "row g-3" do |f| %>
+          <div class="col-md-10">
+            <div class="position-relative" data-controller="live-search" 
+                 data-live-search-url-value="<%= live_search_jobs_path %>"
+                 data-live-search-search-url-value="<%= search_jobs_path %>">
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="iconoir-search text-muted"></i>
+                </span>
+                <%= f.text_field :q, placeholder: "Search jobs using natural language (e.g., 'software engineer at google', 'remote python developer')", 
+                    value: params[:q], 
+                    class: "form-control border-start-0 ps-0", 
+                    id: "job-search-input",
+                    data: { 
+                      live_search_target: "input",
+                      action: "input->live-search#input focus->live-search#input"
+                    } %>
+                <button type="button" class="btn btn-outline-secondary border-start-0 d-none" 
+                        data-live-search-target="clear" 
+                        data-action="click->live-search#clear">
+                  <i class="iconoir-cancel"></i>
+                </button>
               </div>
-              <div class="col-md-3">
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0">
-                    <i class="iconoir-pin-alt text-muted"></i>
-                  </span>
-                  <%= f.text_field :location, placeholder: "Location", 
-                      value: params[:location], class: "form-control border-start-0 ps-0",
-                      id: "location-search-input" %>
-                </div>
+              
+              <!-- Live search results dropdown -->
+              <div class="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-lg d-none" 
+                   style="top: 100%; z-index: 1050; max-height: 400px; overflow-y: auto;"
+                   data-live-search-target="results">
+                <!-- Search results will be populated here -->
               </div>
-              <div class="col-md-2">
-                <%= f.select :employment_type, 
-                    options_for_select([
-                      ['All Types', ''],
-                      ['Full-time', EmploymentType::FULL_TIME],
-                      ['Part-time', EmploymentType::PART_TIME],
-                      ['Contract', EmploymentType::CONTRACT],
-                      ['Freelance', EmploymentType::FREELANCE],
-                      ['Internship', EmploymentType::INTERNSHIP]
-                    ], params[:employment_type]),
-                    {}, { class: "form-select" } %>
-              </div>
-              <div class="col-md-2">
-                <%= f.select :has_salary,
-                    options_for_select([
-                      ['All Salaries', ''],
-                      ['With Salary', 'true']
-                    ], params[:has_salary]),
-                    {}, { class: "form-select" } %>
-              </div>
-              <div class="col-md-1">
-                <%= f.submit "Search", class: "btn btn-primary w-100" %>
-              </div>
-              <div class="col-12">
-                <div class="d-flex justify-content-center mt-3">
-                  <%= link_to jobs_path, class: "btn btn-outline-secondary btn-sm", data: { turbo: false } do %>
-                    <i class="iconoir-refresh me-1"></i>Clear All
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
+            </div>
           </div>
-        </div>
+          <div class="col-md-2">
+            <div class="d-flex gap-2">
+              <%= f.submit "Search", class: "btn btn-primary px-4" %>
+              <%= link_to "Clear", jobs_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
+            </div>
+          </div>
+        <% end %>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- Jobs List -->
     <div class="row">
@@ -127,7 +114,7 @@
                                     data: { turbo: false } %>
                                 <% if job.location.present? %>
                                   <span class="mx-1">•</span>
-                                  <i class="iconoir-pin-alt me-1"></i>
+                                  <i class="iconoir-map-pin me-1"></i>
                                   <span><%= job.location %></span>
                                 <% end %>
                               </p>
@@ -233,6 +220,23 @@
   
   .job-item:hover {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  /* Search bar responsive styles */
+  @media (max-width: 576px) {
+    .input-group .btn {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+    }
+    
+    .input-group .btn i {
+      display: none;
+    }
+  }
+  
+  /* Smooth button transitions */
+  #search-button, #clear-button {
+    transition: all 0.2s ease;
   }
 </style>
 

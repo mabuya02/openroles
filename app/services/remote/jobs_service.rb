@@ -19,7 +19,7 @@ module Remote
       jobs = base_remote_jobs_query
 
       if query.present?
-        jobs = jobs.search(query)
+        jobs = jobs.search_jobs(query)
       end
 
       if skills.present?

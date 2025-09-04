@@ -3,19 +3,18 @@
 # Background job to fetch jobs from external APIs
 class JobFetchJob < ApplicationJob
   queue_as :default
-  retry_on StandardError, wait: :exponentially_longer, attempts: 3
+  retry_on StandardError, wait: 30.seconds, attempts: 3
 
   def perform(sources: nil, keywords: nil, location: nil, limit: 50)
     Rails.logger.info "Starting job fetch from APIs: #{sources || 'all'}"
 
-    job_fetcher = JobFetcherService.new(
-      sources: sources || JobFetcherService::API_SERVICES.keys,
-      keywords: keywords,
+    job_fetcher = TagBasedJobFetcherService.new(
+      sources: sources,
       location: location,
-      limit: limit
+      total_job_limit: limit || 50
     )
 
-    results = job_fetcher.fetch_all
+    results = job_fetcher.fetch_jobs_by_tags
 
     # Log summary
     log_results(results)

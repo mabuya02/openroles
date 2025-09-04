@@ -24,19 +24,75 @@ class RemoteJobsController < ApplicationController
     @query = params[:q]
     @skills = params[:skills]
 
-    @pagy, @jobs = @remote_jobs_service.search_remote_jobs(
-      query: @query,
-      skills: @skills,
-      page: params[:page],
-      per_page: params[:per_page] || 20,
-      filters: filter_params
-    )
+    if @query.present?
+      # Use natural language search service for remote jobs
+      search_service = NaturalLanguageSearchService.new(@query)
+      jobs = search_service.parse_and_search
 
-    @search_metadata = @remote_jobs_service.search_metadata(@query, @skills)
+      # Filter to only remote-friendly jobs
+      jobs = jobs.remote_friendly
+
+      # Apply additional filters
+      jobs = apply_remote_filters(jobs, filter_params)
+
+      @pagy, @jobs = pagy(jobs, limit: params[:per_page] || 20)
+      @search_metadata = {
+        query: @query,
+        total_results: @pagy.count,
+        parsed_data: search_service.parsed_data,
+        external_results: jobs.where.not(source: "internal").count
+      }
+    else
+      # Fallback to service method
+      @pagy, @jobs = @remote_jobs_service.search_remote_jobs(
+        query: @query,
+        skills: @skills,
+        page: params[:page],
+        per_page: params[:per_page] || 20,
+        filters: filter_params
+      )
+      @search_metadata = @remote_jobs_service.search_metadata(@query, @skills)
+    end
 
     respond_to do |format|
       format.html { render :index }
       format.json { render json: { jobs: @jobs, pagination: pagy_metadata(@pagy), metadata: @search_metadata } }
+    end
+  end
+
+  def live_search
+    @query = params[:q]&.strip
+
+    if @query.present? && @query.length >= 2
+      # Use natural language search service for live search on remote jobs
+      search_service = NaturalLanguageSearchService.new(@query)
+      jobs = search_service.parse_and_search.remote_friendly.limit(10)
+
+      @suggestions = jobs.includes(:company).map do |job|
+        {
+          id: job.id,
+          title: job.title,
+          company: job.company.name,
+          location: job.location,
+          employment_type: job.employment_type&.humanize,
+          url: job_path(job),
+          company_url: company_path(job.company),
+          salary: job.salary_range_display
+        }
+      end
+
+      # Add intelligent suggestions based on parsed query
+      @search_metadata = {
+        parsed_data: search_service.parsed_data,
+        suggestions_count: @suggestions.length
+      }
+    else
+      @suggestions = []
+      @search_metadata = {}
+    end
+
+    respond_to do |format|
+      format.json { render json: { suggestions: @suggestions, metadata: @search_metadata } }
     end
   end
 
@@ -57,6 +113,17 @@ class RemoteJobsController < ApplicationController
 
   def set_remote_jobs_service
     @remote_jobs_service = Remote::JobsService.new
+  end
+
+  private
+
+  def apply_remote_filters(jobs, params)
+    # Apply remote-specific filters - use the scope, not a column
+    if params[:remote].present? && params[:remote] != "false"
+      jobs = jobs.remote_friendly
+    end
+
+    jobs
   end
 
   def filter_params

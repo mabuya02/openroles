@@ -18,7 +18,14 @@ class CompaniesController < ApplicationController
   end
 
   def show
-    @company = Company.includes(:jobs).find(params[:id])
+    @company = Company.includes(:jobs).find_by(slug: params[:id])
+
+    # Handle case where company is not found
+    unless @company
+      redirect_to companies_path, alert: "Company not found."
+      return
+    end
+
     @companies_service.track_company_view(@company)
 
     @pagy, @company_jobs = @companies_service.company_jobs(
@@ -29,12 +36,16 @@ class CompaniesController < ApplicationController
 
     @company_stats = @companies_service.company_statistics(@company)
     @similar_companies = @companies_service.similar_companies(@company, limit: 6)
-  rescue ActiveRecord::RecordNotFound
-    redirect_to companies_path, alert: "Company not found."
   end
 
   def jobs
-    @company = Company.find(params[:id])
+    @company = Company.find_by(slug: params[:id])
+
+    unless @company
+      redirect_to companies_path, alert: "Company not found."
+      return
+    end
+
     @pagy, @jobs = @companies_service.company_jobs(
       @company,
       page: params[:page],

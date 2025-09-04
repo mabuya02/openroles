@@ -22,61 +22,41 @@
         <div class="card border-0 shadow-sm">
           <div class="card-body">
             <%= form_with url: search_remote_jobs_path, method: :get, local: true, class: "row g-3" do |f| %>
-              <div class="col-md-3">
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0">
-                    <i class="iconoir-search text-muted"></i>
-                  </span>
-                  <%= f.text_field :q, placeholder: "Job title or keywords", 
-                      value: params[:q], class: "form-control border-start-0 ps-0", 
-                      id: "remote-job-search-input" %>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0">
-                    <i class="iconoir-tag text-muted"></i>
-                  </span>
-                  <%= f.text_field :skills, placeholder: "Skills (comma separated)", 
-                      value: params[:skills], class: "form-control border-start-0 ps-0",
-                      id: "skills-search-input" %>
-                </div>
-              </div>
-              <div class="col-md-2">
-                <%= f.select :employment_type, 
-                    options_for_select([
-                      ['All Types', ''],
-                      ['Full-time', EmploymentType::FULL_TIME],
-                      ['Part-time', EmploymentType::PART_TIME],
-                      ['Contract', EmploymentType::CONTRACT],
-                      ['Freelance', EmploymentType::FREELANCE]
-                    ], params[:employment_type]),
-                    {}, { class: "form-select" } %>
-              </div>
-              <div class="col-md-2">
-                <%= f.select :experience_level,
-                    options_for_select([
-                      ['All Levels', ''],
-                      ['Entry Level', 'entry'],
-                      ['Mid Level', 'mid'],
-                      ['Senior Level', 'senior']
-                    ], params[:experience_level]),
-                    {}, { class: "form-select" } %>
-              </div>
-              <div class="col-md-2">
-                <%= f.select :has_salary,
-                    options_for_select([
-                      ['All Salaries', ''],
-                      ['With Salary', 'true']
-                    ], params[:has_salary]),
-                    {}, { class: "form-select" } %>
-              </div>
-              <div class="col-md-12">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="d-flex gap-2">
-                    <%= f.submit "Search Remote Jobs", class: "btn btn-primary px-4" %>
-                    <%= link_to "Clear Filters", remote_jobs_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
+              <div class="col-md-10">
+                <div class="position-relative" data-controller="live-search" 
+                     data-live-search-url-value="<%= live_search_remote_jobs_path %>"
+                     data-live-search-search-url-value="<%= search_remote_jobs_path %>">
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="iconoir-search text-muted"></i>
+                    </span>
+                    <%= f.text_field :q, placeholder: "Search remote jobs using natural language (e.g., 'remote python developer', 'marketing roles')", 
+                        value: params[:q], 
+                        class: "form-control border-start-0 ps-0", 
+                        id: "remote-job-search-input",
+                        data: { 
+                          live_search_target: "input",
+                          action: "input->live-search#input focus->live-search#input"
+                        } %>
+                    <button type="button" class="btn btn-outline-secondary border-start-0 d-none" 
+                            data-live-search-target="clear" 
+                            data-action="click->live-search#clear">
+                      <i class="iconoir-cancel"></i>
+                    </button>
                   </div>
+                  
+                  <!-- Live search results dropdown -->
+                  <div class="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-lg d-none" 
+                       style="top: 100%; z-index: 1050; max-height: 400px; overflow-y: auto;"
+                       data-live-search-target="results">
+                    <!-- Search results will be populated here -->
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="d-flex gap-2">
+                  <%= f.submit "Search", class: "btn btn-primary px-4" %>
+                  <%= link_to "Clear", remote_jobs_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
                 </div>
               </div>
             <% end %>
@@ -337,5 +317,4 @@
 .counter-value {
   transition: all 0.3s ease;
 }
-</style>
 </style>

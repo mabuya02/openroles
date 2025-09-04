@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     collection do
       get :search
       get :filter
+      get :live_search
     end
   end
 
@@ -68,11 +69,40 @@ Rails.application.routes.draw do
     collection do
       get :search
       get :filter
+      get :live_search
     end
   end
 
+  # Alert routes (require authentication)
+  resources :alerts, except: [ :destroy ] do
+    member do
+      patch :toggle_status
+      post :test_alert
+      get :unsubscribe_confirmation
+      patch :unsubscribe_alert
+    end
+  end
+
+  # Unsubscribe route (no authentication required)
+  get "alerts/unsubscribe/:token", to: "alerts#unsubscribe", as: :unsubscribe_alert
+
   # API routes
   namespace :api do
+    namespace :v1 do
+      resources :companies, only: [ :index, :show ] do
+        member do
+          get :jobs
+        end
+      end
+    end
+
+    # Legacy API routes (for backward compatibility)
+    resources :companies, only: [ :index, :show ] do
+      member do
+        get :jobs
+      end
+    end
+
     resource :job_fetcher, only: [] do
       post :fetch_all
       post :fetch_from_source

@@ -14,49 +14,27 @@
   </div>
 </div>
 
-    <!-- Advanced Search -->
+    <!-- Company Search -->
     <div class="row mb-4">
       <div class="col-12">
         <div class="card border-0 shadow-sm">
           <div class="card-body">
             <%= form_with url: search_companies_path, method: :get, local: true, class: "row g-3" do |f| %>
-              <div class="col-md-4">
+              <div class="col-md-10">
                 <div class="input-group">
                   <span class="input-group-text bg-light border-end-0">
                     <i class="iconoir-search text-muted"></i>
                   </span>
-                  <%= f.text_field :q, placeholder: "Company name or description", 
+                  <%= f.text_field :q, placeholder: "Search companies using natural language (e.g., 'fintech companies', 'tech startups in San Francisco')", 
                       value: params[:q], class: "form-control border-start-0 ps-0", 
                       id: "company-search-input" %>
                 </div>
               </div>
-              <div class="col-md-3">
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0">
-                    <i class="iconoir-pin-alt text-muted"></i>
-                  </span>
-                  <%= f.text_field :location, placeholder: "Location", 
-                      value: params[:location], class: "form-control border-start-0 ps-0",
-                      id: "company-location-search-input" %>
+              <div class="col-md-2">
+                <div class="d-flex gap-2">
+                  <%= f.submit "Search Companies", class: "btn btn-primary px-4" %>
+                  <%= link_to "Clear", companies_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
                 </div>
-              </div>
-              <div class="col-md-2">
-                <%= f.select :industry, 
-                    options_for_select([
-                      ['All Industries', '']
-                    ] + (@featured_industries || []).map { |industry| [industry, industry] }, params[:industry]),
-                    {}, { class: "form-select" } %>
-              </div>
-              <div class="col-md-2">
-                <%= f.select :has_jobs,
-                    options_for_select([
-                      ['All Companies', ''],
-                      ['Currently Hiring', 'true']
-                    ], params[:has_jobs]),
-                    {}, { class: "form-select" } %>
-              </div>
-              <div class="col-md-1">
-                <%= f.submit "Search", class: "btn btn-primary w-100" %>
               </div>
             <% end %>
           </div>
@@ -110,11 +88,11 @@
                         </div>
 
                         <% if company.industry.present? %>
-                          <p class="text-muted fs-13 mb-3" style="min-height: 60px;">
+                          <p class="text-muted fs-13" style="min-height: 60px;">
                             <i class="iconoir-category me-2"></i><%= company.industry %>
                           </p>
                         <% else %>
-                          <p class="text-muted fs-13 mb-3" style="min-height: 60px;">
+                          <p class="text-muted fs-13" style="min-height: 60px;">
                             <i class="iconoir-building me-2"></i>Company in various industries
                           </p>
                         <% end %>

@@ -102,6 +102,27 @@
           </div>
         </div>
       </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <%= link_to alerts_path, class: "btn btn-outline-primary w-100 d-flex align-items-center justify-content-center", data: { turbo: false } do %>
+                <i class="iconoir-bell me-2"></i>Manage Job Alerts
+              <% end %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <%= link_to edit_profile_path, class: "btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center", data: { turbo: false } do %>
+                <i class="iconoir-edit-pencil me-2"></i>Edit Profile
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Profile Details -->

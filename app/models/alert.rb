@@ -45,19 +45,40 @@ class Alert < ApplicationRecord
   end
 
   def matching_jobs
-    query = Job.published
-
-    # Apply tag filters if tags are present
-    if tags.any?
-      tag_ids = tags.pluck(:id)
-      query = query.joins(:tags).where(tags: { id: tag_ids })
-    end
+    query = Job.joins(:company).published
 
     # Apply criteria filters from JSON
     if criteria.present?
+      # Handle natural language query or keywords
+      search_terms = nil
+      if criteria["natural_query"].present?
+        search_terms = criteria["natural_query"]
+      elsif criteria["keywords"].present?
+        search_terms = criteria["keywords"]
+      end
+
+      # Search in title, description, and company name
+      if search_terms.present?
+        search_terms = search_terms.to_s.downcase
+        # Split search terms and search for any of them
+        terms = search_terms.split(/[\s,]+/).reject(&:blank?)
+
+        if terms.any?
+          term_conditions = []
+          term_params = []
+
+          terms.each do |term|
+            term_conditions << "(jobs.title ILIKE ? OR jobs.description ILIKE ? OR companies.name ILIKE ?)"
+            term_params += [ "%#{term}%", "%#{term}%", "%#{term}%" ]
+          end
+
+          query = query.where(term_conditions.join(" OR "), *term_params)
+        end
+      end
+
       # Location filter
       if criteria["location"].present?
-        query = query.where("location ILIKE ?", "%#{criteria['location']}%")
+        query = query.where("jobs.location ILIKE ?", "%#{criteria['location']}%")
       end
 
       # Employment type filter
@@ -73,25 +94,34 @@ class Alert < ApplicationRecord
       if criteria["salary_max"].present?
         query = query.where("salary_min <= ? OR salary_max <= ?", criteria["salary_max"], criteria["salary_max"])
       end
+    end
 
-      # Keywords search
-      if criteria["keywords"].present?
-        query = query.search(criteria["keywords"])
-      end
+    # Apply tag filters if tags are present
+    if tags.any?
+      tag_ids = tags.pluck(:id)
+      query = query.joins(:tags).where(tags: { id: tag_ids })
     end
 
     # Only return jobs posted after the last notification or alert creation
     cutoff_time = last_notified_at || created_at
-    query.where("jobs.posted_at > ?", cutoff_time)
+    query.where("jobs.posted_at > ? OR jobs.created_at > ?", cutoff_time, cutoff_time)
+  end
+
+  def active?
+    status == AlertStatus::ACTIVE
+  end
+
+  def unsubscribe!
+    update!(status: AlertStatus::INACTIVE)
+  end
+
+  def reactivate!
+    update!(status: AlertStatus::ACTIVE, last_notified_at: nil)
   end
 
   private
 
   def generate_unsubscribe_token
     self.unsubscribe_token = SecureRandom.urlsafe_base64(32)
-  end
-
-  def active?
-    status == AlertStatus::ACTIVE
   end
 end

@@ -21,7 +21,24 @@ module Openroles
     # ----------------------------
     # Job Queue Configuration
     # ----------------------------
-    config.active_job.queue_adapter = :async
+    config.active_job.queue_adapter = :solid_queue
+
+    # Configure recurring jobs for production
+    # Note: recurring_schedule not supported in solid_queue 1.2.1
+    # config.solid_queue.recurring_schedule = {
+    #   alert_notifications: {
+    #     command: "AlertNotificationJob.perform_later",
+    #     schedule: "every 2 hours"
+    #   },
+    #   external_job_fetch: {
+    #     command: "ExternalJobFetchJob.perform_later",
+    #     schedule: "daily at 2am"
+    #   },
+    #   job_maintenance: {
+    #     command: "ScheduledJobMaintenanceJob.perform_later",
+    #     schedule: "daily at 3am"
+    #   }
+    # }
 
     # ----------------------------
     # Timezone Configuration

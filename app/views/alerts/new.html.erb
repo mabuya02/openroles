@@ -1,0 +1,266 @@
+<% content_for :title, "Create Job Alert" %>
+<% content_for :description, "Set up a personalized job alert to get notified about new opportunities." %>
+
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Create Job Alert</h4>
+      <div class="page-title-right">
+        <ol class="breadcrumb m-0">
+          <li class="breadcrumb-item"><%= link_to "Alerts", alerts_path, data: { turbo: false } %></li>
+          <li class="breadcrumb-item active">New Alert</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-bottom">
+        <h5 class="card-title mb-0">
+          <i class="iconoir-bell-notification me-2 text-primary"></i>
+          Set Up Your Job Alert
+        </h5>
+      </div>
+      <div class="card-body p-4">
+        <%= form_with(model: @alert, local: true, data: { turbo: false }) do |form| %>
+          <% if @alert.errors.any? %>
+            <div class="alert alert-danger">
+              <h6>Please fix the following errors:</h6>
+              <ul class="mb-0">
+                <% @alert.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <!-- Natural Language Search -->
+          <div class="mb-4">
+            <label class="form-label fw-medium" for="natural_query">
+              <i class="iconoir-brain me-1 text-primary"></i>
+              Describe Your Ideal Job
+            </label>
+            <textarea 
+              class="form-control" 
+              id="natural_query" 
+              name="alert[natural_query]" 
+              rows="3" 
+              placeholder="Example: 'Remote software engineer at tech companies' or 'Marketing manager in healthcare'"
+            ><%= params[:query] || (@alert.criteria&.[]("natural_query")) %></textarea>
+            <div class="form-text">
+              Use natural language to describe what you're looking for. Our AI will understand and match relevant jobs.
+            </div>
+          </div>
+
+          <!-- Example Queries -->
+          <div class="mb-4">
+            <label class="form-label fw-medium">Quick Examples:</label>
+            <div class="d-flex flex-wrap gap-2">
+              <% example_queries = [
+                "remote software engineer", 
+                "marketing roles in tech companies", 
+                "full-time python developer", 
+                "contract frontend developer", 
+                "product manager at startups"
+              ] %>
+              <% example_queries.each do |example| %>
+                <button type="button" class="btn btn-outline-secondary btn-sm example-query" data-query="<%= example %>">
+                  <%= example %>
+                </button>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Frequency Selection -->
+          <div class="mb-4">
+            <label class="form-label fw-medium" for="alert_frequency">
+              <i class="iconoir-clock me-1 text-primary"></i>
+              Notification Frequency
+            </label>
+            <%= form.select :frequency, 
+                options_for_select([
+                  ['Daily - Get notified every day', 'daily'],
+                  ['Weekly - Get notified every week', 'weekly'],
+                  ['Monthly - Get notified every month', 'monthly']
+                ], @alert.frequency || 'weekly'), 
+                {}, 
+                { class: "form-select", id: "alert_frequency" } %>
+          </div>
+
+          <!-- Advanced Filters (Optional) -->
+          <div class="advanced-filters-section">
+            <div class="mb-3">
+              <button type="button" class="btn btn-link text-decoration-none p-0" data-bs-toggle="collapse" data-bs-target="#advanced-filters">
+                <i class="iconoir-settings me-1"></i>
+                Advanced Filters (Optional)
+                <i class="iconoir-nav-arrow-down ms-1"></i>
+              </button>
+            </div>
+
+            <div class="collapse" id="advanced-filters">
+              <div class="border rounded p-3 bg-light">
+                <!-- Tags Selection -->
+                <% if defined?(Tag) && Tag.count > 0 %>
+                  <div class="mb-3">
+                    <label class="form-label fw-medium">Tags</label>
+                    <div class="tags-selection">
+                      <% Tag.limit(20).each do |tag| %>
+                        <div class="form-check form-check-inline">
+                          <%= check_box_tag "alert[tag_ids][]", tag.id, 
+                              @alert.tags.include?(tag), 
+                              id: "tag_#{tag.id}", 
+                              class: "form-check-input" %>
+                          <%= label_tag "tag_#{tag.id}", tag.name, class: "form-check-label" %>
+                        </div>
+                      <% end %>
+                    </div>
+                    <div class="form-text">
+                      Select relevant tags to refine your job matches further.
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex justify-content-between mt-4">
+            <%= link_to alerts_path, class: "btn btn-outline-secondary", data: { turbo: false } do %>
+              <i class="iconoir-arrow-left me-1"></i>Back to Alerts
+            <% end %>
+            
+            <div>
+              <button type="submit" class="btn btn-primary">
+                <i class="iconoir-bell-notification me-1"></i>Create Alert
+              </button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-4">
+    <!-- How It Works -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-bottom">
+        <h6 class="card-title mb-0">
+          <i class="iconoir-info-circle me-1 text-primary"></i>
+          How Job Alerts Work
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="step-item mb-3">
+          <div class="d-flex align-items-start">
+            <span class="badge bg-primary rounded-circle me-3 mt-1" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px;">1</span>
+            <div>
+              <h6 class="mb-1">Describe Your Ideal Job</h6>
+              <p class="text-muted fs-13 mb-0">Use natural language to tell us what you're looking for.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-item mb-3">
+          <div class="d-flex align-items-start">
+            <span class="badge bg-primary rounded-circle me-3 mt-1" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px;">2</span>
+            <div>
+              <h6 class="mb-1">Choose Frequency</h6>
+              <p class="text-muted fs-13 mb-0">Decide how often you want to receive notifications.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-item mb-0">
+          <div class="d-flex align-items-start">
+            <span class="badge bg-primary rounded-circle me-3 mt-1" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px;">3</span>
+            <div>
+              <h6 class="mb-1">Get Notified</h6>
+              <p class="text-muted fs-13 mb-0">Receive email notifications when matching jobs are found.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-bottom">
+        <h6 class="card-title mb-0">
+          <i class="iconoir-light-bulb me-1 text-warning"></i>
+          Tips for Better Matches
+        </h6>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled mb-0">
+          <li class="mb-2">
+            <i class="iconoir-check text-success me-2"></i>
+            <span class="fs-13">Be specific about your role and skills</span>
+          </li>
+          <li class="mb-2">
+            <i class="iconoir-check text-success me-2"></i>
+            <span class="fs-13">Mention preferred work arrangement (remote, hybrid, etc.)</span>
+          </li>
+          <li class="mb-2">
+            <i class="iconoir-check text-success me-2"></i>
+            <span class="fs-13">Include industry preferences if any</span>
+          </li>
+          <li class="mb-0">
+            <i class="iconoir-check text-success me-2"></i>
+            <span class="fs-13">Use keywords that appear in job descriptions</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle example query buttons
+  const exampleButtons = document.querySelectorAll('.example-query');
+  const queryTextarea = document.getElementById('natural_query');
+  
+  exampleButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const query = this.dataset.query;
+      queryTextarea.value = query;
+      queryTextarea.focus();
+    });
+  });
+});
+</script>
+
+<style>
+  .step-item {
+    position: relative;
+  }
+
+  .step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 32px;
+    width: 2px;
+    height: 24px;
+    background-color: #e9ecef;
+  }
+
+  .example-query {
+    transition: all 0.2s ease;
+  }
+
+  .example-query:hover {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+
+  .tags-selection {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+</style>

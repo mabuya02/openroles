@@ -99,6 +99,9 @@
               <%= link_to profile_path, class: "dropdown-item d-flex align-items-center" do %>
                 <i class="mdi mdi-face-man icon-md me-2"></i> Profile
               <% end %>
+              <%= link_to alerts_path, class: "dropdown-item d-flex align-items-center" do %>
+                <i class="mdi mdi-bell-outline icon-md me-2"></i> Job Alerts
+              <% end %>
               <% unless current_user.email_verified? %>
                 <div class="dropdown-divider"></div>
                 <%= link_to auth_resend_email_path, method: :post, class: "dropdown-item d-flex align-items-center", data: { confirm: "Resend email verification?" } do %>

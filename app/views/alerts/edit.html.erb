@@ -1,0 +1,221 @@
+<%- content_for :title, "Edit Job Alert" %>
+<%- content_for :meta_description, "Edit your job alert criteria and settings" %>
+
+<div class="container-xxl">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">
+            <i class="mdi mdi-bell-outline me-2 text-primary"></i>
+            Edit Job Alert
+          </h4>
+        </div>
+        
+        <div class="card-body">
+          <%= form_with(model: @alert, local: true, class: "row g-3") do |form| %>
+            <% if @alert.errors.any? %>
+              <div class="col-12">
+                <div class="alert alert-danger">
+                  <h6>Please fix the following errors:</h6>
+                  <ul class="mb-0">
+                    <% @alert.errors.full_messages.each do |message| %>
+                      <li><%= message %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+            <% end %>
+
+            <!-- Natural Language Search -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="alert_natural_query" class="form-label fw-semibold">
+                  <i class="mdi mdi-magnify me-1"></i>
+                  Search Query
+                </label>
+                <%= text_field_tag "alert[natural_query]", 
+                    @alert.criteria&.[]("natural_query"),
+                    class: "form-control form-control-lg", 
+                    id: "alert_natural_query",
+                    placeholder: "e.g., 'software engineer at uber', 'remote python developer', 'marketing roles in tech companies'",
+                    required: true %>
+                <div class="form-text">
+                  Use natural language to describe the jobs you're looking for.
+                </div>
+              </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="col-md-6">
+              <label for="alert_frequency" class="form-label fw-semibold">
+                <i class="mdi mdi-calendar me-1"></i>
+                Notification Frequency
+              </label>
+              <%= form.select :frequency, 
+                  options_for_select([
+                    ['Daily', 'daily'],
+                    ['Weekly', 'weekly'],
+                    ['Monthly', 'monthly']
+                  ], @alert.frequency), 
+                  {}, 
+                  { class: "form-select" } %>
+            </div>
+
+            <div class="col-md-6">
+              <label for="alert_status" class="form-label fw-semibold">
+                <i class="mdi mdi-toggle-switch me-1"></i>
+                Status
+              </label>
+              <%= form.select :status, 
+                  options_for_select([
+                    ['Active', 'active'],
+                    ['Inactive', 'inactive']
+                  ], @alert.status), 
+                  {}, 
+                  { class: "form-select" } %>
+            </div>
+
+            <!-- Tags Section -->
+            <div class="col-12">
+              <label class="form-label fw-semibold">
+                <i class="mdi mdi-tag-multiple me-1"></i>
+                Relevant Tags (Optional)
+              </label>
+              <div class="row g-2">
+                <% Tag.popular.limit(20).each do |tag| %>
+                  <div class="col-md-4 col-sm-6">
+                    <div class="form-check">
+                      <%= check_box_tag "alert[tag_ids][]", tag.id, 
+                          @alert.tags.include?(tag), 
+                          { 
+                            class: "form-check-input", 
+                            id: "tag_#{tag.id}" 
+                          } %>
+                      <label class="form-check-label" for="tag_<%= tag.id %>">
+                        <%= tag.name %>
+                      </label>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+              <div class="form-text">
+                Select relevant tags to improve matching accuracy.
+              </div>
+            </div>
+
+            <!-- Current Alert Preview -->
+            <div class="col-12">
+              <div class="alert alert-info">
+                <h6 class="mb-2">
+                  <i class="mdi mdi-information me-1"></i>
+                  Current Alert Summary
+                </h6>
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <% if @alert.criteria["natural_query"].present? %>
+                    <span class="badge bg-primary">
+                      Query: "<%= @alert.criteria["natural_query"] %>"
+                    </span>
+                  <% end %>
+                  
+                  <span class="badge bg-info">
+                    <%= @alert.frequency.humanize %> notifications
+                  </span>
+                  
+                  <span class="badge <%= @alert.active? ? 'bg-success' : 'bg-secondary' %>">
+                    <%= @alert.active? ? 'Active' : 'Inactive' %>
+                  </span>
+                  
+                  <% if @alert.tags.any? %>
+                    <span class="badge bg-warning">
+                      <%= pluralize(@alert.tags.count, 'tag') %> selected
+                    </span>
+                  <% end %>
+                </div>
+                <small class="text-muted">
+                  Created <%= time_ago_in_words(@alert.created_at) %> ago
+                  <% if @alert.last_notified_at %>
+                    • Last notification sent <%= time_ago_in_words(@alert.last_notified_at) %> ago
+                  <% end %>
+                </small>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-12">
+              <div class="d-flex gap-2 justify-content-between">
+                <%= link_to "Cancel", alert_path(@alert), 
+                            class: "btn btn-outline-secondary" %>
+                
+                <div class="d-flex gap-2">
+                  <% if @alert.persisted? %>
+                    <%= form_with url: test_alert_alert_path(@alert), method: :post, class: "d-inline",
+                        data: { turbo_confirm: "This will send a test email with current matching jobs. Continue?" } do %>
+                      <button type="submit" class="btn btn-outline-info">
+                        Test Alert
+                      </button>
+                    <% end %>
+                  <% end %>
+                  
+                  <%= form.submit "Update Alert", 
+                      class: "btn btn-primary" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Matching Jobs Preview -->
+      <% if @alert.persisted? %>
+        <div class="card mt-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="mdi mdi-briefcase-outline me-1"></i>
+              Current Matching Jobs Preview
+            </h6>
+            <small class="text-muted">
+              <%= link_to "View all", alert_path(@alert) %>
+            </small>
+          </div>
+          <div class="card-body">
+            <% matching_jobs = @alert.matching_jobs.includes(:company).limit(3) %>
+            <% if matching_jobs.any? %>
+              <div class="row g-2">
+                <% matching_jobs.each do |job| %>
+                  <div class="col-12">
+                    <div class="border rounded p-2">
+                      <h6 class="mb-1">
+                        <%= link_to job.title, job_path(job), 
+                                    class: "text-decoration-none" %>
+                      </h6>
+                      <small class="text-muted">
+                        <i class="mdi mdi-office-building me-1"></i>
+                        <%= job.company.name %>
+                        <% if job.location.present? %>
+                          • <i class="mdi mdi-map-marker me-1"></i><%= job.location %>
+                        <% end %>
+                      </small>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+              <% if @alert.matching_jobs.count > 3 %>
+                <div class="text-center mt-2">
+                  <small class="text-muted">
+                    + <%= @alert.matching_jobs.count - 3 %> more jobs match this alert
+                  </small>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="text-center text-muted py-3">
+                <i class="mdi mdi-magnify me-1"></i>
+                No jobs currently match this alert
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

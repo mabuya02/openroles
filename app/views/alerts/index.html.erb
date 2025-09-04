@@ -1,0 +1,224 @@
+<% content_for :title, "My Job Alerts" %>
+<% content_for :description, "Manage your job alerts and get notified when new opportunities match your criteria." %>
+
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">My Job Alerts</h4>
+      <div class="page-title-right">
+        <%= link_to new_alert_path, class: "btn btn-primary", data: { turbo: false } do %>
+          <i class="iconoir-plus me-1"></i>Create New Alert
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if @alerts.any? %>
+  <div class="row">
+    <% @alerts.each do |alert| %>
+      <div class="col-lg-6 col-xl-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <% if alert.status == AlertStatus::ACTIVE %>
+                <span class="badge bg-success-subtle text-success">
+                  <i class="iconoir-check-circle me-1"></i>Active
+                </span>
+              <% else %>
+                <span class="badge bg-secondary-subtle text-secondary">
+                  <i class="iconoir-pause me-1"></i>Inactive
+                </span>
+              <% end %>
+              <span class="badge bg-primary-subtle text-primary ms-2">
+                <%= alert.frequency.humanize %>
+              </span>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-link text-muted" data-bs-toggle="dropdown">
+                <i class="iconoir-more-horiz"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <%= link_to alert_path(alert), class: "dropdown-item", data: { turbo: false } do %>
+                    <i class="iconoir-eye me-2"></i>View Details
+                  <% end %>
+                </li>
+                <li>
+                  <%= link_to edit_alert_path(alert), class: "dropdown-item", data: { turbo: false } do %>
+                    <i class="iconoir-edit-pencil me-2"></i>Edit Alert
+                  <% end %>
+                </li>
+                <li>
+                  <%= form_with url: test_alert_alert_path(alert), method: :post, class: "d-inline" do %>
+                    <button type="submit" class="dropdown-item border-0 bg-transparent text-start w-100">
+                      <i class="iconoir-send me-2"></i>Send Test
+                    </button>
+                  <% end %>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <%= form_with url: toggle_status_alert_path(alert), method: :patch, class: "d-inline" do %>
+                    <button type="submit" class="dropdown-item border-0 bg-transparent text-start w-100">
+                      <% if alert.status == AlertStatus::ACTIVE %>
+                        <i class="iconoir-pause me-2"></i>Deactivate
+                      <% else %>
+                        <i class="iconoir-play me-2"></i>Activate
+                      <% end %>
+                    </button>
+                  <% end %>
+                </li>
+                <li>
+                  <%= link_to unsubscribe_confirmation_alert_path(alert), class: "dropdown-item text-warning" do %>
+                    <i class="iconoir-log-out me-2"></i>Unsubscribe
+                  <% end %>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <div class="alert-criteria mb-3">
+              <% if alert.criteria.present? && alert.criteria["natural_query"].present? %>
+                <h6 class="mb-2">Search Query:</h6>
+                <p class="text-primary mb-0 fw-medium">
+                  "<%= alert.criteria["natural_query"] %>"
+                </p>
+              <% else %>
+                <h6 class="mb-2">Custom Filters:</h6>
+                <% if alert.criteria.present? %>
+                  <div class="d-flex flex-wrap gap-1">
+                    <% alert.criteria.each do |key, value| %>
+                      <% next if value.blank? %>
+                      <span class="badge bg-light text-dark">
+                        <%= key.humanize %>: <%= value %>
+                      </span>
+                    <% end %>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+
+            <% if alert.tags.any? %>
+              <div class="alert-tags mb-3">
+                <h6 class="mb-2">Tags:</h6>
+                <div class="d-flex flex-wrap gap-1">
+                  <% alert.tags.each do |tag| %>
+                    <span class="badge bg-secondary-subtle text-secondary">
+                      <%= tag.name %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+
+            <div class="alert-stats">
+              <div class="row text-center">
+                <div class="col-6">
+                  <div class="stat-item">
+                    <h5 class="fw-bold text-primary mb-1">
+                      <%= alert.matching_jobs.count %>
+                    </h5>
+                    <p class="text-muted mb-0 fs-13">Current Matches</p>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="stat-item">
+                    <h5 class="fw-bold text-success mb-1">
+                      <%= alert.last_notified_at.present? ? time_ago_in_words(alert.last_notified_at) : 'Never' %>
+                    </h5>
+                    <p class="text-muted mb-0 fs-13">Last Sent</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer bg-light border-top">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                Created <%= time_ago_in_words(alert.created_at) %> ago
+              </small>
+              <%= link_to alert_path(alert), class: "btn btn-outline-primary btn-sm", data: { turbo: false } do %>
+                <i class="iconoir-arrow-right me-1"></i>View Details
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <!-- Empty State -->
+  <div class="row">
+    <div class="col-12">
+      <div class="text-center py-5">
+        <div class="mb-4">
+          <i class="iconoir-bell-notification display-4 text-muted"></i>
+        </div>
+        <h4 class="mb-3">No Job Alerts Yet</h4>
+        <p class="text-muted mb-4 lead">
+          Create your first job alert to get notified when new opportunities match your preferences.
+        </p>
+        
+        <div class="d-flex justify-content-center gap-3">
+          <%= link_to new_alert_path, class: "btn btn-primary", data: { turbo: false } do %>
+            <i class="iconoir-plus me-1"></i>Create Your First Alert
+          <% end %>
+          
+          <%= link_to jobs_path, class: "btn btn-outline-primary", data: { turbo: false } do %>
+            <i class="iconoir-search me-1"></i>Browse Jobs First
+          <% end %>
+        </div>
+
+        <div class="mt-5">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="feature-item mb-3">
+                <i class="iconoir-fast-arrow-right text-primary fs-2 mb-2"></i>
+                <h6>Instant Notifications</h6>
+                <p class="text-muted fs-13">Get notified as soon as jobs matching your criteria are posted</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="feature-item mb-3">
+                <i class="iconoir-brain text-primary fs-2 mb-2"></i>
+                <h6>Smart Matching</h6>
+                <p class="text-muted fs-13">Our AI understands natural language queries like "remote Python developer"</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="feature-item mb-3">
+                <i class="iconoir-settings text-primary fs-2 mb-2"></i>
+                <h6>Flexible Frequency</h6>
+                <p class="text-muted fs-13">Choose daily, weekly, or monthly notifications based on your preference</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<style>
+  .stat-item {
+    padding: 10px;
+    border-radius: 6px;
+    background: rgba(0, 123, 255, 0.05);
+  }
+
+  .feature-item {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .alert-criteria {
+    min-height: 60px;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+  }
+</style>

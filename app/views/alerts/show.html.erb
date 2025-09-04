@@ -1,0 +1,220 @@
+<%- content_for :title, "Job Alert Details" %>
+<%- content_for :meta_description, "View your job alert details and matching jobs" %>
+
+<div class="container-xxl">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <!-- Alert Details Header -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">
+            <i class="mdi mdi-bell-outline me-2 text-primary"></i>
+            Job Alert Details
+          </h4>
+          <div class="d-flex gap-2">
+            <%= link_to edit_alert_path(@alert), class: "btn btn-outline-primary btn-sm" do %>
+              <i class="mdi mdi-pencil me-1"></i> Edit
+            <% end %>
+            <%= link_to unsubscribe_confirmation_alert_path(@alert), class: "btn btn-outline-warning btn-sm" do %>
+              <i class="mdi mdi-email-remove me-1"></i> Unsubscribe
+            <% end %>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <!-- Alert Query -->
+              <% if @alert.criteria["natural_query"].present? %>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold text-muted">Search Query</label>
+                  <p class="fs-5 mb-0">"<%= @alert.criteria["natural_query"] %>"</p>
+                </div>
+              <% end %>
+
+              <!-- Alert Criteria -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold text-muted">Alert Criteria</label>
+                <div class="d-flex flex-wrap gap-2">
+                  <% if @alert.criteria["company_name"].present? %>
+                    <span class="badge bg-primary-subtle text-primary">
+                      <i class="mdi mdi-office-building me-1"></i>
+                      <%= @alert.criteria["company_name"] %>
+                    </span>
+                  <% end %>
+                  
+                  <% if @alert.criteria["location"].present? %>
+                    <span class="badge bg-info-subtle text-info">
+                      <i class="mdi mdi-map-marker me-1"></i>
+                      <%= @alert.criteria["location"] %>
+                    </span>
+                  <% end %>
+                  
+                  <% if @alert.criteria["remote"].present? %>
+                    <span class="badge bg-success-subtle text-success">
+                      <i class="mdi mdi-home me-1"></i>
+                      Remote
+                    </span>
+                  <% end %>
+                  
+                  <% if @alert.criteria["employment_type"].present? %>
+                    <span class="badge bg-warning-subtle text-warning">
+                      <i class="mdi mdi-clock me-1"></i>
+                      <%= @alert.criteria["employment_type"].humanize %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- Alert Status -->
+              <div class="row">
+                <div class="col-sm-6">
+                  <label class="form-label fw-semibold text-muted">Frequency</label>
+                  <p class="mb-0 text-capitalize">
+                    <i class="mdi mdi-calendar me-1"></i>
+                    <%= @alert.frequency %>
+                  </p>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label fw-semibold text-muted">Status</label>
+                  <p class="mb-0">
+                    <span class="badge <%= @alert.active? ? 'bg-success' : 'bg-secondary' %>">
+                      <i class="mdi mdi-<%= @alert.active? ? 'check-circle' : 'pause-circle' %> me-1"></i>
+                      <%= @alert.active? ? 'Active' : 'Inactive' %>
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="text-center">
+                <div class="mb-2">
+                  <span class="fs-3 fw-bold text-primary"><%= @matching_jobs.count %></span>
+                </div>
+                <p class="text-muted mb-0">Matching Jobs</p>
+              </div>
+              
+              <div class="mt-3 text-center">
+                <small class="text-muted">
+                  <i class="mdi mdi-calendar me-1"></i>
+                  Created <%= time_ago_in_words(@alert.created_at) %> ago
+                </small>
+                <% if @alert.last_notified_at %>
+                  <br>
+                  <small class="text-muted">
+                    <i class="mdi mdi-email me-1"></i>
+                    Last sent <%= time_ago_in_words(@alert.last_notified_at) %> ago
+                  </small>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Matching Jobs -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="mdi mdi-briefcase-outline me-2"></i>
+            Matching Jobs (<%= @matching_jobs.count %>)
+          </h5>
+        </div>
+        
+        <div class="card-body">
+          <% if @matching_jobs.any? %>
+            <div class="row g-3">
+              <% @matching_jobs.each do |job| %>
+                <div class="col-12">
+                  <div class="border rounded p-3 hover-shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <h6 class="mb-1">
+                          <%= link_to job.title, job_path(job), 
+                                      class: "text-decoration-none fw-semibold" %>
+                        </h6>
+                        
+                        <div class="d-flex align-items-center text-muted mb-2">
+                          <i class="mdi mdi-office-building me-1"></i>
+                          <%= link_to job.company.name, company_path(job.company), 
+                                      class: "text-decoration-none text-muted me-3" %>
+                          
+                          <% if job.location.present? %>
+                            <i class="mdi mdi-map-marker me-1"></i>
+                            <span class="me-3"><%= job.location %></span>
+                          <% end %>
+                          
+                          <% if job.employment_type.present? %>
+                            <i class="mdi mdi-clock me-1"></i>
+                            <span><%= job.employment_type.humanize %></span>
+                          <% end %>
+                        </div>
+
+                        <% if job.description.present? %>
+                          <p class="text-muted mb-0 small">
+                            <%= truncate(strip_tags(job.description), length: 150) %>
+                          </p>
+                        <% end %>
+                      </div>
+                      
+                      <div class="text-end ms-3">
+                        <small class="text-muted d-block">
+                          <%= time_ago_in_words(job.created_at) %> ago
+                        </small>
+                        <%= link_to "View Job", job_path(job), 
+                                    class: "btn btn-sm btn-outline-primary mt-2" %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+            
+            <% if @alert.matching_jobs.count > @matching_jobs.count %>
+              <div class="text-center mt-4">
+                <p class="text-muted">
+                  Showing <%= @matching_jobs.count %> of <%= @alert.matching_jobs.count %> matching jobs
+                </p>
+                <small class="text-muted">
+                  Full list of matches will be sent in your next email notification
+                </small>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-5">
+              <i class="mdi mdi-magnify display-4 text-muted"></i>
+              <h5 class="mt-3 text-muted">No Matching Jobs Found</h5>
+              <p class="text-muted mb-4">
+                There are currently no jobs that match your alert criteria.<br>
+                You'll be notified as soon as new matching jobs are posted.
+              </p>
+              <%= link_to "Edit Alert Criteria", edit_alert_path(@alert), 
+                          class: "btn btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="text-center mt-4">
+        <%= link_to "← Back to Alerts", alerts_path, 
+                    class: "btn btn-outline-secondary" %>
+        
+        <% if @alert.active? %>
+          <%= form_with url: toggle_status_alert_path(@alert), method: :patch, class: "d-inline" do %>
+            <button type="submit" class="btn btn-outline-warning ms-2">
+              <i class="mdi mdi-pause me-1"></i> Pause Alert
+            </button>
+          <% end %>
+        <% else %>
+          <%= form_with url: toggle_status_alert_path(@alert), method: :patch, class: "d-inline" do %>
+            <button type="submit" class="btn btn-outline-success ms-2">
+              <i class="mdi mdi-play me-1"></i> Activate Alert
+            </button>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
