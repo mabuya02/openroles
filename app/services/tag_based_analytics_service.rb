@@ -3,19 +3,19 @@
 # Service for tracking and analyzing tag-based job fetching performance
 class TagBasedAnalyticsService
   include JobFetchingConfig
-  
+
   # Cache keys
   CACHE_KEYS = {
-    history_list: 'tag_analytics_history',
-    tag_effectiveness: 'tag_effectiveness',
-    api_stats: 'api_performance_stats'
+    history_list: "tag_analytics_history",
+    tag_effectiveness: "tag_effectiveness",
+    api_stats: "api_performance_stats"
   }.freeze
 
   class << self
     # Track a job fetch operation
     def track_fetch(strategy:, tags_used:, jobs_found:, api_results: {})
       analytics_data = build_analytics_data(strategy, tags_used, jobs_found, api_results)
-      
+
       cache_fetch_data(analytics_data)
       add_to_history(analytics_data.slice(:timestamp, :strategy, :jobs_found, :created, :updated))
       update_tag_effectiveness(tags_used, api_results)
@@ -165,7 +165,7 @@ class TagBasedAnalyticsService
     def build_analytics_data(strategy, tags_used, jobs_found, api_results)
       created_count = api_results.values.sum { |result| result[:created] || 0 }
       updated_count = api_results.values.sum { |result| result[:updated] || 0 }
-      
+
       {
         timestamp: Time.current,
         strategy: strategy,
@@ -181,18 +181,18 @@ class TagBasedAnalyticsService
       Rails.cache.write(
         "fetch_history_#{analytics_data[:timestamp].to_i}",
         analytics_data,
-        expires_in: DEFAULT_CONFIG[:analytics_cache_ttl].days
+        expires_in: JobFetchingConfig::DEFAULT_CONFIG[:analytics_cache_ttl].days
       )
     end
 
     def add_to_history(fetch_data)
       history = Rails.cache.read(CACHE_KEYS[:history_list]) || []
       history << fetch_data
-      history = history.last(DEFAULT_CONFIG[:analytics_history_limit])
+      history = history.last(JobFetchingConfig::DEFAULT_CONFIG[:analytics_history_limit])
       Rails.cache.write(
-        CACHE_KEYS[:history_list], 
-        history, 
-        expires_in: DEFAULT_CONFIG[:analytics_cache_ttl].days
+        CACHE_KEYS[:history_list],
+        history,
+        expires_in: JobFetchingConfig::DEFAULT_CONFIG[:analytics_cache_ttl].days
       )
     end
 

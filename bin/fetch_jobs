@@ -1,0 +1,78 @@
+#!/usr/bin/env ruby
+# Simple command to fetch jobs from all APIs and save to database
+
+require_relative '../config/environment'
+
+puts "🚀 Starting comprehensive job fetch from all APIs..."
+puts "=" * 60
+
+# Check current job count
+initial_count = Job.count
+puts "📊 Current jobs in database: #{initial_count}"
+puts
+
+# Initialize the TagBasedJobFetcherService with optimal settings
+puts "🏷️  Initializing job fetcher with balanced tag strategy..."
+service = TagBasedJobFetcherService.new(
+  tag_strategy: 'balanced',              # Use balanced tags for good coverage
+  max_tags: 25,                          # Use 25 different search terms
+  sources: ['adzuna', 'jooble', 'remote_ok', 'remotive']  # All available APIs
+)
+
+puts "🔍 Fetching keywords from tags database..."
+tags = Tag.get_fetching_keywords(strategy: 'balanced', limit: 25)
+puts "📝 Using search terms: #{tags.join(', ')}"
+puts
+
+# Fetch jobs from all APIs
+puts "🌐 Fetching jobs from all APIs..."
+puts "   • Adzuna API"
+puts "   • Jooble API" 
+puts "   • RemoteOK API"
+puts "   • Remotive API"
+puts
+
+begin
+  result = service.fetch_jobs_by_tags
+  
+  # Show results
+  final_count = Job.count
+  new_jobs = final_count - initial_count
+  
+  puts "✅ Job fetch completed successfully!"
+  puts "=" * 60
+  puts "📈 RESULTS:"
+  puts "   • Jobs before: #{initial_count}"
+  puts "   • Jobs after:  #{final_count}"
+  puts "   • New jobs:    #{new_jobs}"
+  puts "   • APIs used:   #{result[:sources_used] if result.is_a?(Hash)}"
+  puts
+  
+  if new_jobs > 0
+    puts "🎉 Successfully fetched #{new_jobs} new jobs!"
+    
+    # Show some stats about the new jobs
+    recent_jobs = Job.limit(5).order(created_at: :desc)
+    puts
+    puts "📋 Latest jobs added:"
+    recent_jobs.each_with_index do |job, index|
+      puts "   #{index + 1}. #{job.title} at #{job.company&.name || 'Company'}"
+    end
+  else
+    puts "ℹ️  No new jobs found (might be duplicates or API limits reached)"
+  end
+  
+rescue => e
+  puts "❌ Error occurred during job fetch:"
+  puts "   #{e.message}"
+  puts
+  puts "🔧 Troubleshooting tips:"
+  puts "   • Check your internet connection"
+  puts "   • Verify API credentials in .env file"
+  puts "   • Check if APIs have rate limits"
+  puts "   • Ensure database is properly configured"
+end
+
+puts
+puts "🏁 Job fetch command completed!"
+puts "=" * 60

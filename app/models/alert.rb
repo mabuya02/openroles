@@ -83,16 +83,18 @@ class Alert < ApplicationRecord
 
       # Employment type filter
       if criteria["employment_type"].present?
-        query = query.where(employment_type: criteria["employment_type"])
+        query = query.where("jobs.employment_type = ?", criteria["employment_type"])
       end
 
       # Salary range filter
       if criteria["salary_min"].present?
-        query = query.where("salary_min >= ? OR salary_max >= ?", criteria["salary_min"], criteria["salary_min"])
+        salary_min_value = criteria["salary_min"].to_i
+        query = query.where("jobs.salary_min >= ? OR jobs.salary_max >= ?", salary_min_value, salary_min_value)
       end
 
       if criteria["salary_max"].present?
-        query = query.where("salary_min <= ? OR salary_max <= ?", criteria["salary_max"], criteria["salary_max"])
+        salary_max_value = criteria["salary_max"].to_i
+        query = query.where("jobs.salary_min <= ? OR jobs.salary_max <= ?", salary_max_value, salary_max_value)
       end
     end
 

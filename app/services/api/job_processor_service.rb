@@ -226,17 +226,18 @@ module Api
     end
 
     def valid_job_data?(job_data)
+      company_valid = job_data[:company]&.is_a?(Hash) && job_data[:company][:name].present?
+
       is_valid = job_data[:title].present? &&
                  job_data[:description].present? &&
-                 job_data[:company]&.is_a?(Hash) &&
-                 job_data[:company][:name].present?
+                 company_valid
 
       unless is_valid
         missing_fields = []
         missing_fields << "title" unless job_data[:title].present?
         missing_fields << "description" unless job_data[:description].present?
         missing_fields << "company (Hash)" unless job_data[:company]&.is_a?(Hash)
-        missing_fields << "company.name" unless job_data[:company]&.[](:name)&.present?
+        missing_fields << "company.name" unless company_valid
 
         Rails.logger.debug "Invalid job data - missing: #{missing_fields.join(', ')}" if Rails.env.development?
       end

@@ -136,11 +136,7 @@
     </style>
   </head>
   <body>
-    <div class="email-container">
-      <div class="email-header">
-        <h1><%= @app_name || ENV.fetch('APP_NAME', 'OpenRoles') %></h1>
-      </div>
-      
+    <div class="email-container">      
       <div class="email-body">
         <div class="email-content">
           <%= yield %>

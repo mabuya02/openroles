@@ -1,8 +1,10 @@
 # OpenRoles
 
-A modern job board platform built with Ruby on Rails that connects job seekers with exciting opportunities. OpenRoles provides a clean, intuitive interface for browsing jobs, searching with natural language, and managing job alerts.
+A modern job board platform built with Ruby on Rails that connects job seekers with exciting opportunities. OpenRoles provides a clean, intuitive interface for browsing jobs, searching with natural language, automated job alerts, and comprehensive job aggregation from multiple sources.
 
 ## Table of Contents
+
+- [Features](#features)
   - [For Job Seekers](#for-job-seekers)
 - [Prerequisites](#prerequisites)
 - [Local Setup](#local-setup)
@@ -11,6 +13,8 @@ A modern job board platform built with Ruby on Rails that connects job seekers w
   - [3. Database Setup](#3-database-setup)
   - [4. Environment Configuration](#4-environment-configuration)
   - [5. Start the Application](#5-start-the-application)
+  - [6. Populate Database with External Data](#6-populate-database-with-external-data)
+  - [7. Set Up Job Alerts System](#7-set-up-job-alerts-system)
 - [Database Schema](#database-schema)
   - [Core Models](#core-models)
   - [Key Features](#key-features)
@@ -21,17 +25,18 @@ A modern job board platform built with Ruby on Rails that connects job seekers w
   - [Code Organization Decisions](#code-organization-decisions)
 - [Testing](#testing)
 - [API Documentation](#api-documentation)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Features
 
 ### For Job Seekers
 
-- **Smart Job Search**: Natural language search with intelligent query parsing and external API integration
-- **Job Alerts**: Set up automated email alerts for new job postings matching your criteria
+- **Smart Job Search**: Natural language search with intelligent query parsing and external API integration from multiple sources
+- **Automated Job Alerts**: Set up intelligent email alerts for new job postings matching your criteria with daily, weekly, or monthly frequency
+- **Multi-Source Job Aggregation**: Automatically fetch jobs from Adzuna, Jooble, RemoteOK, and Remotive APIs with smart tag-based targeting
 - **Company Profiles**: Detailed company information including culture, benefits, and open positions
 - **Profile Management**: Create and manage your professional profile with skills and experience
+- **Remote Job Focus**: Dedicated section for remote work opportunities from around the world
 
 ## Prerequisites
 
@@ -81,9 +86,6 @@ cp .env.example .env
 Then edit the `.env` file with your configuration:
 
 ```bash
-# Database
-DATABASE_URL=postgresql://username:password@localhost/openroles_development
-
 # Email Configuration (required for alerts and notifications)
 SMTP_ADDRESS=smtp.your-provider.com
 SMTP_PORT=587
@@ -102,8 +104,15 @@ SECRET_KEY_BASE=your-secret-key-base
 RAILS_ENV=development
 ```
 
+**Generate SECRET_KEY_BASE:**
+```bash
+# Generate a new secret key
+rails secret
+```
+Copy the generated key and use it as your `SECRET_KEY_BASE` value.
+
 **Important**: 
-- **Email Server**: Configure your SMTxP settings for sending job alerts and notifications
+- **Email Server**: Configure your SMTP settings for sending job alerts and notifications
 - **API Keys**: Obtain API keys from job board providers (Adzuna, Jooble, RemoteOK) to enable external job fetching
 - **Without API keys**: The application will only search jobs in your local database
 
@@ -119,21 +128,103 @@ rails assets:watch
 
 Visit `http://localhost:3000` to see the application running!
 
+### 6. Populate Database with External Data
+
+Once your application is running and you have configured your API keys, you can fetch jobs and companies from external APIs:
+
+```bash
+# Fetch jobs using the tag-based system (recommended for initial setup)
+bin/fetch_jobs_by_tags
+
+# This script will:
+# 1. Use the seeded tags to intelligently fetch relevant jobs
+# 2. Fetch from all available APIs (Adzuna, Jooble, RemoteOK, Remotive)
+# 3. Avoid duplicate job postings
+# 4. Organize jobs by professional categories
+
+# View statistics about fetched data
+rails jobs:stats
+```
+
+**Available API Sources:**
+- `adzuna` - General job board with wide coverage
+- `jooble` - International job search engine
+- `remoteok` - Remote work opportunities
+- `remotive` - Remote jobs in tech
+
+**Tips:**
+- Run `rails jobs:fetch` regularly to keep your job database up-to-date
+- Use specific keywords with `jobs:fetch_from` to target relevant positions
+- Check `rails jobs:stats` to monitor your database growth
+- Test API connections with `rails jobs:test_apis` if you encounter issues
+
+### 7. Set Up Job Alerts System
+
+The application includes a comprehensive job alert system that sends email notifications to users when new jobs match their criteria.
+
+#### Seed Tag Database
+
+First, populate the tag database for intelligent job fetching:
+
+```bash
+# Seed the comprehensive tag database (341 professional tags)
+rails runner "TagSeeder.new.seed_all_tags"
+```
+
+This creates tags across categories like:
+- Programming languages (Ruby, Python, JavaScript, etc.)
+- Frameworks (Rails, React, Django, etc.)
+- Job roles (Developer, Designer, Manager, etc.)
+- Skills (Machine Learning, DevOps, etc.)
+
+#### Background Job Processing
+
+Configure background job processing for automated alerts:
+
+```bash
+# Start the background job processor (in production, use a process manager)
+bundle exec rails solid_queue:start
+
+# Or run jobs inline for development
+rails runner 'Rails.application.config.active_job.queue_adapter = :inline'
+```
+
+#### Schedule Recurring Alerts
+
+Set up recurring alert processing:
+
+```bash
+# Process daily alerts
+rails runner 'DailyJobAlertsJob.perform_now'
+
+# Process all pending alerts
+rails runner 'BulkJobAlertsJob.perform_now'
+
+# Check alert processing status
+rails runner 'puts "Total alerts: #{Alert.active.count}"; puts "Users with alerts: #{User.joins(:alerts).distinct.count}"'
+```
+
 ## Database Schema
 
 ### Core Models
 
-- **User**: Authentication and profile management
-- **Company**: Employer profiles and information
-- **Job**: Job postings with full-text search capabilities
-- **Alert**: User job alerts with email notifications
+- **User**: Authentication and profile management with email verification
+- **Company**: Employer profiles and information with job posting capabilities
+- **Job**: Job postings with full-text search capabilities and external API integration
+- **Alert**: User job alerts with intelligent matching and email notifications
+- **Tag**: Professional skills and technology tags for job categorization and fetching
 - **UserProfile**: Extended user information and preferences
+- **Background Jobs**: SolidQueue integration for alert processing and job fetching
 
 ### Key Features
-- **UUID Primary Keys**: Enhanced security and performance
-- **Full-Text Search**: Optimized job search with PostgreSQL
-- **Composite Indexes**: Fast query performance for job lookups
-- **Email Verification**: Secure user registration process
+
+- **UUID Primary Keys**: Enhanced security and performance across all models
+- **Full-Text Search**: Optimized job search with PostgreSQL's built-in search capabilities
+- **Composite Indexes**: Fast query performance for job lookups and alert matching
+- **Email Verification**: Secure user registration and notification system
+- **Multi-API Integration**: Automated job fetching from Adzuna, Jooble, RemoteOK, and Remotive
+- **Intelligent Alert System**: Tag-based job matching with customizable frequency (daily/weekly/monthly)
+- **Background Processing**: Automated job fetching and alert processing via SolidQueue
 
 ## Design Decisions
 
@@ -228,14 +319,17 @@ Visit `http://localhost:3000` to see the application running!
 
 **Examples**:
 - `NaturalLanguageSearchService` for search query parsing
-- `JobFetchService` for external API integrations
-- `AlertNotificationService` for email processing
+- `TagBasedJobFetcherService` for intelligent external API integrations with tag-based targeting
+- `AlertNotificationService` for email processing and job matching
+- `JobSearchService` for advanced search functionality
+- `AlertMailer` for comprehensive email template system
 
 **Reasoning**:
 - Keeps controllers thin
-- Improves testability
-- Enables code reuse
+- Improves testability and maintainability
+- Enables code reuse across different parts of the application
 - Clear separation of concerns
+- Better error handling and logging
 
 #### 2. **Concern-Based Model Organization**
 **Decision**: Used Rails concerns for shared model behavior.
@@ -267,12 +361,14 @@ Visit `http://localhost:3000` to see the application running!
 - Email system tests
 - Database optimization tests
 
-##  API Documentation
+## API Documentation
 
 The application provides RESTful APIs for job search and company data:
 
+### Public APIs
+
 ```bash
-# Job search API
+# Job search API with natural language support
 GET /api/jobs?q=search_term
 
 # Company API  
@@ -280,6 +376,44 @@ GET /api/companies/:id
 
 # Jobs by company
 GET /api/companies/:id/jobs
+
+# Live search for autocomplete
+GET /api/live_search?q=partial_term
+
+# Remote jobs API
+GET /api/remote_jobs?q=search_term
+```
+
+### Admin APIs
+
+```bash
+# Job fetching from external APIs
+POST /admin/jobs/fetch
+
+# Alert management
+GET /admin/alerts
+POST /admin/alerts/:id/test
+
+# System statistics
+GET /admin/stats
+```
+
+### Background Job APIs
+
+The application includes several background jobs for automation:
+
+```bash
+# Daily job alerts processing
+DailyJobAlertsJob.perform_now
+
+# Bulk alert notifications
+BulkJobAlertsJob.perform_now
+
+# External job fetching
+ExternalJobFetchJob.perform_now
+
+# Email verification
+EmailVerificationJob.perform_now
 ```
 
 

@@ -1,5 +1,4 @@
-🎯 NEW JOB OPPORTUNITIES - OPENROLES
-=============================================
+🎯 NEW JOB OPPORTUNITIES
 
 Hi <%= @user.first_name %>!
 
@@ -10,24 +9,27 @@ We found <%= pluralize(@matching_jobs.count, 'new job') %> matching your alert c
 Your custom job preferences
 <% end -%>
 
-📊 QUICK STATS:
-- <%= @matching_jobs.count %> new jobs
-- <%= @matching_jobs.map(&:company).uniq.count %> companies
-- <%= @matching_jobs.count { |job| job.location&.downcase&.include?('remote') } %> remote positions
+📊 OVERVIEW:
+• <%= @matching_jobs.count %> new jobs
+• <%= @matching_jobs.map(&:company).uniq.count %> companies  
+• <%= @matching_jobs.count { |job| job.location&.downcase&.include?('remote') } %> remote positions
 
-🔥 YOUR MATCHES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔥 YOUR JOB MATCHES:
+
 <% @matching_jobs.each_with_index do |job, index| -%>
-
-<%= index + 1 %>. <%= job.title %>
-   Company: <%= job.company.name %><% if job.company.industry.present? %> (<%= job.company.industry.humanize %>)<% end %>
-<% if job.location.present? -%>
-   Location: <%= job.location %>
-<% end -%>
+<%= index + 1 %>. <%= job.title.upcase %>
+   🏢 <%= job.company.name %><% if job.company.industry.present? %> • <%= job.company.industry.humanize %><% end %>
+   📍 <%= job.location.present? ? job.location : 'Location not specified' %>
 <% if job.employment_type.present? -%>
-   Type: <%= job.employment_type.humanize %>
+   💼 <%= job.employment_type.humanize %>
+<% end -%>
+<% if job.location&.downcase&.include?('remote') -%>
+   📡 REMOTE POSITION
 <% end -%>
 <% if job.salary_min.present? || job.salary_max.present? -%>
-   Salary: <% if job.salary_min.present? && job.salary_max.present? -%>
+   💰 <% if job.salary_min.present? && job.salary_max.present? -%>
 <%= number_to_currency(job.salary_min, precision: 0) %> - <%= number_to_currency(job.salary_max, precision: 0) %>
 <% elsif job.salary_min.present? -%>
 From <%= number_to_currency(job.salary_min, precision: 0) %>
@@ -35,23 +37,27 @@ From <%= number_to_currency(job.salary_min, precision: 0) %>
 Up to <%= number_to_currency(job.salary_max, precision: 0) %>
 <% end -%>
 <% end -%>
-   Posted: <%= time_ago_in_words(job.posted_at || job.created_at) %> ago
+   📅 Posted <%= time_ago_in_words(job.posted_at || job.created_at) %> ago
    
 <% if job.description.present? -%>
-   <%= truncate(strip_tags(job.description), length: 150) %>
+   📝 <%= truncate(strip_tags(job.description), length: 120) %>
+<% end -%>
+<% if job.tags.any? -%>
+   🏷️  Tags: <%= job.tags.limit(3).map(&:name).join(', ') %><% if job.tags.count > 3 %> (+<%= job.tags.count - 3 %> more)<% end %>
 <% end -%>
 
-   👀 View Job: <%= job_url(job) %>
+   �️  VIEW: <%= job_url(job) %>
+<% if job.apply_url.present? -%>
+   ✋ APPLY: <%= job.apply_url %>
+<% end -%>
+
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 <% end -%>
 
 🔧 MANAGE YOUR ALERTS:
-- View this alert: <%= @alert_url %>
-- Browse all jobs: <%= jobs_url %>
-- Update preferences: <%= @alert_url %>
+• Manage this alert: <%= @alert_url %>
+• Browse all jobs: <%= jobs_url %>
+• Unsubscribe: <%= @unsubscribe_url %>
 
----
-This is your <%= @alert.frequency %> job alert from OpenRoles.
-We'll keep you updated with the latest matches.
-
-Don't want these emails? Unsubscribe: <%= @unsubscribe_url %>
+This is your <%= @alert.frequency %> job alert.

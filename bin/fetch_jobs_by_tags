@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+# Simple command to run tag-based job fetching
+
+require_relative '../config/environment'
+
+puts "🚀 OpenRoles Tag-Based Job Fetcher"
+puts "=" * 50
+
+# Show current database state
+initial_jobs = Job.count
+initial_companies = Company.count
+total_tags = Tag.count
+
+puts "📊 Current State:"
+puts "  Jobs: #{initial_jobs}"
+puts "  Companies: #{initial_companies}" 
+puts "  Available Tags: #{total_tags}"
+puts
+
+# Configuration options
+strategy = ARGV[0] || 'balanced'
+max_tags = (ARGV[1] || '20').to_i
+
+puts "⚙️  Configuration:"
+puts "  Strategy: #{strategy}"
+puts "  Max Tags: #{max_tags}"
+puts "  APIs: jooble, adzuna, remotive, remoteok"
+puts
+
+# Show which tags will be used
+puts "🏷️  Selected Tags:"
+selected_tags = Tag.get_fetching_keywords(strategy: strategy, limit: [max_tags, 10].min)
+puts "  #{selected_tags.join(', ')}"
+puts
+
+# Run the job fetching
+puts "🔄 Starting job fetch..."
+begin
+  result = TagBasedJobFetcherService.new(
+    tag_strategy: strategy,
+    max_tags: max_tags
+  ).fetch_jobs_by_tags
+
+  # Show results
+  final_jobs = Job.count
+  final_companies = Company.count
+  new_jobs = final_jobs - initial_jobs
+  new_companies = final_companies - initial_companies
+
+  puts "✅ Job fetch completed!"
+  puts
+  puts "📈 Results:"
+  puts "  Jobs: #{initial_jobs} → #{final_jobs} (+#{new_jobs})"
+  puts "  Companies: #{initial_companies} → #{final_companies} (+#{new_companies})"
+  puts "  Tags Used: #{result[:tags_attempted]}"
+  puts "  APIs Used: #{result[:api_sources_used]}"
+  puts "  Success: #{result[:success] ? 'Yes' : 'No'}"
+
+  if result[:errors].any?
+    puts
+    puts "⚠️  Errors (#{result[:errors].size}):"
+    result[:errors].each do |error|
+      puts "  - #{error[:source]}: #{error[:keyword]} - #{error[:error]}"
+    end
+  end
+
+  # Show sample jobs
+  if new_jobs > 0
+    puts
+    puts "📋 Sample New Jobs:"
+    Job.includes(:company).order(created_at: :desc).limit(5).each_with_index do |job, i|
+      puts "  #{i+1}. #{job.title}"
+      puts "     Company: #{job.company.name}"
+      puts "     Location: #{job.location || 'Not specified'}"
+      puts "     Source: #{job.source}"
+      puts
+    end
+  end
+
+rescue => e
+  puts "❌ Error occurred: #{e.message}"
+  puts "   #{e.backtrace.first}"
+  exit 1
+end
+
+puts "🎉 Tag-based job fetching completed successfully!"
+puts "   Run './bin/fetch_jobs_by_tags [strategy] [max_tags]' to customize"
+puts "   Available strategies: balanced, comprehensive, exploration, trending, performance"

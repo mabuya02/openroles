@@ -10,7 +10,7 @@ class TagBasedJobFetcherService
   attr_accessor :sources, :tag_strategy, :location, :jobs_per_tag, :max_tags, :total_job_limit
 
   validates :tag_strategy, inclusion: { in: VALID_STRATEGIES.map(&:to_s) }
-  validates :jobs_per_tag, :max_tags, :total_job_limit, 
+  validates :jobs_per_tag, :max_tags, :total_job_limit,
             numericality: { greater_than: 0 }
 
   def initialize(attributes = {})
@@ -21,25 +21,25 @@ class TagBasedJobFetcherService
     @jobs_per_tag = DEFAULT_CONFIG[:jobs_per_tag]
     @max_tags = DEFAULT_CONFIG[:max_tags]
     @total_job_limit = DEFAULT_CONFIG[:total_job_limit]
-    
+
     # Assign provided attributes
     assign_attributes(attributes)
-    
+
     # Validate and process
     @sources = Array(@sources).map(&:to_sym) & API_SERVICES.map(&:to_sym)
     @tag_strategy = @tag_strategy.to_s
     @results = initialize_results
-    
+
     validate!
     ensure_seed_data
   end
 
   def fetch_jobs_by_tags
     log_fetch_start
-    
+
     keywords = fetch_keywords_from_tags
     return build_result if keywords.empty?
-    
+
     fetch_jobs_for_keywords(keywords)
     process_and_save_jobs
     track_analytics
@@ -106,9 +106,17 @@ class TagBasedJobFetcherService
   end
 
   def fetch_from_source_with_keyword(source, keyword)
-    return [] unless API_SERVICES.key?(source)
+    return [] unless API_SERVICES.include?(source.to_s)
 
-    service_class = API_SERVICES[source].constantize
+    # Handle special case for remoteok service naming
+    service_class_name = case source.to_s
+    when "remoteok"
+                           "Api::RemoteOkService"
+    else
+                           "Api::#{source.to_s.camelize}Service"
+    end
+
+    service_class = service_class_name.constantize
     service = service_class.new(keyword, @location, @jobs_per_tag)
     jobs = service.fetch_jobs
 
@@ -129,7 +137,7 @@ class TagBasedJobFetcherService
 
   def process_jobs_in_batches
     # Remove duplicates
-    unique_jobs = @results[:jobs].uniq { |job| [job[:external_id], job[:api_source]] }
+    unique_jobs = @results[:jobs].uniq { |job| [ job[:external_id], job[:api_source] ] }
     Rails.logger.info "After deduplication: #{unique_jobs.length} unique jobs"
 
     # Process jobs in batches by source

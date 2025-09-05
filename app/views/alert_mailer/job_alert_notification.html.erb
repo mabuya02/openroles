@@ -1,140 +1,195 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Job Opportunities - OpenRoles</title>
-  <style>
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8f9fa; }
-    .container { max-width: 600px; margin: 0 auto; background-color: white; }
-    .header { background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); padding: 30px 20px; text-align: center; }
-    .header h1 { color: white; margin: 0; font-size: 28px; font-weight: 300; }
-    .content { padding: 30px 20px; }
-    .alert-info { background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #007bff; }
-    .job-item { border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 20px; background-color: #fff; }
-    .job-title { font-size: 18px; font-weight: 600; color: #007bff; margin-bottom: 8px; }
-    .job-company { font-size: 16px; font-weight: 500; color: #333; margin-bottom: 8px; }
-    .job-details { font-size: 14px; color: #666; margin-bottom: 15px; }
-    .job-description { font-size: 14px; color: #555; margin-bottom: 15px; line-height: 1.5; }
-    .job-actions { text-align: right; }
-    .btn { display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: 500; }
-    .btn:hover { background-color: #0056b3; }
-    .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
-    .unsubscribe { margin-top: 20px; font-size: 12px; color: #666; }
-    .unsubscribe a { color: #666; }
-    .stats { display: flex; justify-content: space-around; margin: 20px 0; }
-    .stat-item { text-align: center; }
-    .stat-number { font-size: 24px; font-weight: bold; color: #007bff; }
-    .stat-label { font-size: 12px; color: #666; }
-    .badge { display: inline-block; padding: 4px 8px; background-color: #28a745; color: white; font-size: 12px; border-radius: 12px; margin-left: 8px; }
-    .remote-badge { background-color: #28a745; }
-    .location-badge { background-color: #6c757d; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <h1>🎯 New Job Opportunities</h1>
-      <p style="color: #e3f2fd; margin: 10px 0 0 0;">Your personalized job matches</p>
-    </div>
+<style>
+  .alert-header { 
+    background-color: #e3f2fd; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin-bottom: 30px; 
+    border-left: 4px solid #007bff; 
+  }
+  
+  .job-stats { 
+    display: flex; 
+    justify-content: space-around; 
+    margin: 20px 0; 
+    padding: 20px; 
+    background-color: #f8f9fa; 
+    border-radius: 8px; 
+  }
+  
+  .stat-item { text-align: center; }
+  .stat-number { font-size: 24px; font-weight: bold; color: #007bff; display: block; }
+  .stat-label { font-size: 12px; color: #666; }
+  
+  /* Clean table styling */
+  .jobs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .jobs-table th {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  .jobs-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+  }
+  
+  .jobs-table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .jobs-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .job-title-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .job-title-link:hover {
+    text-decoration: underline;
+  }
+  
+  .company-name {
+    color: #333;
+    font-weight: 500;
+  }
+  
+  .location-text {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .action-buttons-cell {
+    white-space: nowrap;
+  }
+  
+  .action-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  
+  .action-link:hover {
+    text-decoration: underline;
+    color: #0056b3;
+  }
+  
+  .action-buttons { 
+    text-align: center; 
+    margin: 30px 0; 
+  }
+  
+  .unsubscribe-info { 
+    margin-top: 30px; 
+    padding: 20px; 
+    background-color: #f8f9fa; 
+    border-radius: 8px; 
+    text-align: center; 
+  }
+  
+  /* Mobile responsiveness */
+  @media only screen and (max-width: 600px) {
+    .jobs-table {
+      font-size: 12px;
+    }
+    .jobs-table th,
+    .jobs-table td {
+      padding: 10px 8px;
+    }
+    .action-link {
+      font-size: 12px;
+    }
+  }
+</style>
+<div class="alert-header">
+  <h3 style="margin-top: 0; color: #007bff;">Hi <%= @user.first_name %>!</h3>
+  <p style="margin: 0;">
+    We found <strong><%= pluralize(@matching_jobs.count, 'new job') %></strong> matching your alert criteria:
+    <% if @alert.criteria["natural_query"].present? %>
+      "<em><%= @alert.criteria["natural_query"] %></em>"
+    <% else %>
+      Your custom job preferences
+    <% end %>
+  </p>
+</div>
 
-    <!-- Content -->
-    <div class="content">
-      <!-- Alert Info -->
-      <div class="alert-info">
-        <h3 style="margin-top: 0; color: #007bff;">Hi <%= @user.first_name %>!</h3>
-        <p style="margin: 0;">
-          We found <strong><%= pluralize(@matching_jobs.count, 'new job') %></strong> matching your alert criteria:
-          <% if @alert.criteria["natural_query"].present? %>
-            "<em><%= @alert.criteria["natural_query"] %></em>"
-          <% else %>
-            Your custom job preferences
-          <% end %>
-        </p>
-      </div>
-
-      <!-- Job Stats -->
-      <div class="stats">
-        <div class="stat-item">
-          <div class="stat-number"><%= @matching_jobs.count %></div>
-          <div class="stat-label">New Jobs</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number"><%= @matching_jobs.map(&:company).uniq.count %></div>
-          <div class="stat-label">Companies</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number"><%= @matching_jobs.count { |job| job.location&.downcase&.include?('remote') } %></div>
-          <div class="stat-label">Remote</div>
-        </div>
-      </div>
-
-      <!-- Job Listings -->
-      <% @matching_jobs.each do |job| %>
-        <div class="job-item">
-          <div class="job-title">
-            <%= job.title %>
-            <% if job.location.downcase.include?('remote') %>
-              <span class="badge remote-badge">Remote</span>
-            <% end %>
-            <% if job.employment_type.present? %>
-              <span class="badge location-badge"><%= job.employment_type.humanize %></span>
-            <% end %>
-          </div>
-          <div class="job-company">
-            📢 <%= job.company.name %>
-            <% if job.company.industry.present? %>
-              • <%= job.company.industry.humanize %>
-            <% end %>
-          </div>
-          <div class="job-details">
-            <% if job.location.present? %>
-              📍 <%= job.location %>
-            <% end %>
-            <% if job.salary_min.present? || job.salary_max.present? %>
-              • 💰 
-              <% if job.salary_min.present? && job.salary_max.present? %>
-                <%= number_to_currency(job.salary_min, precision: 0) %> - <%= number_to_currency(job.salary_max, precision: 0) %>
-              <% elsif job.salary_min.present? %>
-                From <%= number_to_currency(job.salary_min, precision: 0) %>
-              <% elsif job.salary_max.present? %>
-                Up to <%= number_to_currency(job.salary_max, precision: 0) %>
-              <% end %>
-            <% end %>
-            • 📅 Posted <%= time_ago_in_words(job.posted_at || job.created_at) %> ago
-          </div>
-          <% if job.description.present? %>
-            <div class="job-description">
-              <%= truncate(strip_tags(job.description), length: 200) %>
-            </div>
-          <% end %>
-          <div class="job-actions">
-            <a href="<%= job_url(job) %>" class="btn">View Job Details</a>
-          </div>
-        </div>
-      <% end %>
-
-      <!-- Call to Action -->
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="<%= @alert_url %>" class="btn" style="margin-right: 10px;">Manage This Alert</a>
-        <a href="<%= jobs_url %>" class="btn" style="background-color: #28a745;">Browse All Jobs</a>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-      <p><strong>OpenRoles</strong> - Find your next opportunity</p>
-      <p>This is your <strong><%= @alert.frequency %></strong> job alert. We'll keep you updated with the latest matches.</p>
-      
-      <div class="unsubscribe">
-        <p>
-          Don't want to receive these emails? 
-          <a href="<%= @unsubscribe_url %>">Unsubscribe from this alert</a> | 
-          <a href="<%= @alert_url %>">Update preferences</a>
-        </p>
-      </div>
-    </div>
+<div class="job-stats">
+  <div class="stat-item">
+    <span class="stat-number"><%= @matching_jobs.count %></span>
+    <span class="stat-label">New Jobs</span>
   </div>
-</body>
-</html>
+  <div class="stat-item">
+    <span class="stat-number"><%= @matching_jobs.map(&:company).uniq.count %></span>
+    <span class="stat-label">Companies</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number"><%= @matching_jobs.count { |job| job.location&.downcase&.include?('remote') } %></span>
+    <span class="stat-label">Remote</span>
+  </div>
+</div>
+<!-- Jobs Table - Clean and Simple -->
+<table class="jobs-table">
+  <thead>
+    <tr>
+      <th>Job Title</th>
+      <th>Company</th>
+      <th>Location</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @matching_jobs.each do |job| %>
+      <tr>
+        <td>
+          <a href="<%= job_url(job) %>" class="job-title-link">
+            <%= job.title %>
+          </a>
+        </td>
+        <td>
+          <span class="company-name"><%= job.company.name %></span>
+        </td>
+        <td>
+          <span class="location-text">
+            <%= job.location.present? ? job.location : 'Not specified' %>
+          </span>
+        </td>
+        <td class="action-buttons-cell">
+          <a href="<%= job_url(job) %>" class="action-link">View Job</a>
+          <% if job.apply_url.present? %>
+            | <a href="<%= job.apply_url %>" class="action-link" target="_blank">Apply</a>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div class="action-buttons">
+  <a href="<%= @alert_url %>" class="btn" style="margin-right: 10px;">Manage Alert</a>
+  <a href="<%= jobs_url %>" class="btn" style="background-color: #28a745;">Browse All Jobs</a>
+</div>
+
+<div class="unsubscribe-info">
+  <p style="margin: 0; font-size: 14px; color: #666;">
+    This is your <strong><%= @alert.frequency %></strong> job alert. 
+    <a href="<%= @unsubscribe_url %>" style="color: #666;">Unsubscribe</a> or 
+    <a href="<%= @alert_url %>" style="color: #666;">update preferences</a>.
+  </p>
+</div>

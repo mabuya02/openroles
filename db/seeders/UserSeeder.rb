@@ -7,7 +7,7 @@ class UserSeeder
         first_name: "Mabuya",
         last_name: "Maina",
         email: "mainamanasseh02@gmail.com",
-        phone_number: "0758316403",
+        phone_number: "+254758316403",
         password: "Mabuya02.dev1",
         status: UserStatus::ACTIVE,
         email_verified: true
@@ -16,7 +16,7 @@ class UserSeeder
         first_name: "Joshua",
         last_name: "Mwangi",
         email: "mwangijoshua990@gmail.com",
-        phone_number: "0702798550",
+        phone_number: "+254702798550",
         password: "Mabuya02.dev!",
         status: UserStatus::ACTIVE,
         email_verified: true
