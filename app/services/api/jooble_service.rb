@@ -58,47 +58,22 @@ module Api
     end
 
     def extract_employment_type(job_data)
-      title = job_data["title"]&.downcase || ""
-      snippet = job_data["snippet"]&.downcase || ""
-
-      return "part_time" if title.include?("part time") || snippet.include?("part time")
-      return "contract" if title.include?("contract") || snippet.include?("contract")
-      return "internship" if title.include?("intern") || snippet.include?("intern")
-
-      "full_time"
+      # Use shared extraction method
+      extract_employment_type_from_text(job_data, fields: [ :title, :snippet ])
     end
 
     def extract_salary_from_snippet(snippet)
-      return nil unless snippet
+      return nil unless snippet.present?
 
-      # Look for salary patterns like $50,000, $50k, £30000, etc.
-      salary_match = snippet.match(/[\$£€](\d+(?:,\d{3})*(?:k)?)/i)
-      return nil unless salary_match
-
-      salary_str = salary_match[1].gsub(",", "")
-      salary = salary_str.include?("k") ? salary_str.to_i * 1000 : salary_str.to_i
-
-      salary if salary > 1000 # Basic validation
+      # Use shared salary extraction method
+      extract_salary_from_text(snippet, type: :min)
     end
 
     def extract_skills_from_description(snippet)
-      return [] unless snippet
+      return [] unless snippet.present?
 
-      # Common tech skills to look for
-      skills = %w[
-        ruby rails python django flask nodejs react vue angular
-        javascript typescript java spring php laravel
-        mysql postgresql mongodb redis elasticsearch
-        aws azure gcp docker kubernetes git github
-        html css bootstrap tailwind rest graphql
-        linux ubuntu centos devops ci/cd jenkins
-      ]
-
-      found_skills = skills.select do |skill|
-        snippet.downcase.include?(skill.downcase)
-      end
-
-      found_skills.uniq
+      # Use shared tech skills extraction method
+      extract_tech_skills(snippet)
     end
   end
 end

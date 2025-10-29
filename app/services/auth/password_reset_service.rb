@@ -1,14 +1,14 @@
-class Auth::PasswordResetService
-  attr_reader :user, :errors, :reset_token
+class Auth::PasswordResetService < Auth::BaseService
+  attr_reader :reset_token
 
   def initialize(email: nil, token: nil, new_password: nil, password_confirmation: nil, ip_address: nil, user_agent: nil)
+    super()
     @email = email&.downcase&.strip
     @token = token
     @new_password = new_password
     @password_confirmation = password_confirmation
     @ip_address = ip_address
     @user_agent = user_agent
-    @errors = []
   end
 
   def request_reset
@@ -34,24 +34,21 @@ class Auth::PasswordResetService
 
     true
   rescue ActiveRecord::RecordInvalid => e
-    @errors.concat(e.record.errors.full_messages)
+    add_errors(e.record.errors.full_messages)
     false
-  end
-
-  def success?
-    @errors.empty?
   end
 
   private
 
   def valid_email?
     if @email.blank?
-      @errors << "Email is required"
+      add_error("Email is required")
       return false
     end
 
-    unless @email.match?(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i)
-      @errors << "Please enter a valid email address"
+    # Use base class email validation
+    unless valid_email_format?(@email)
+      add_error("Please enter a valid email address")
       return false
     end
 
@@ -97,18 +94,14 @@ class Auth::PasswordResetService
   end
 
   def valid_reset_params?
-    if @token.blank?
-      @errors << "Reset token is required"
-    end
+    add_error("Reset token is required") if @token.blank?
 
-    if @new_password.blank?
-      @errors << "New password is required"
-    elsif @new_password.length < 8
-      @errors << "Password must be at least 8 characters long"
-    end
-
-    if @new_password != @password_confirmation
-      @errors << "Password confirmation doesn't match password"
+    # Use base class password validation
+    if @new_password.present?
+      valid_password?(@new_password)
+      passwords_match?(@new_password, @password_confirmation)
+    else
+      add_error("New password is required")
     end
 
     @errors.empty?
@@ -118,24 +111,24 @@ class Auth::PasswordResetService
     @reset_token = PasswordResetToken.find_by(token: @token)
 
     unless @reset_token
-      @errors << "Invalid or expired reset token"
+      add_error("Invalid or expired reset token")
       return false
     end
 
     if @reset_token.expired?
-      @errors << "Reset token has expired. Please request a new one."
+      add_error("Reset token has expired. Please request a new one.")
       return false
     end
 
     if @reset_token.used?
-      @errors << "Reset token has already been used. Please request a new one."
+      add_error("Reset token has already been used. Please request a new one.")
       return false
     end
 
     @user = @reset_token.user
 
     unless @user.active?
-      @errors << "Account is not active"
+      add_error("Account is not active")
       return false
     end
 

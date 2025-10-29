@@ -1,9 +1,9 @@
-class Auth::RegisterService
-  attr_reader :user, :errors, :verification_code
+class Auth::RegisterService < Auth::BaseService
+  attr_reader :verification_code
 
   def initialize(user_params)
+    super()
     @user_params = user_params.to_h.with_indifferent_access
-    @errors = []
   end
 
   def call
@@ -20,12 +20,8 @@ class Auth::RegisterService
 
     true
   rescue ActiveRecord::RecordInvalid => e
-    @errors.concat(e.record.errors.full_messages)
+    add_errors(e.record.errors.full_messages)
     false
-  end
-
-  def success?
-    @user&.persisted? && @errors.empty?
   end
 
   private
@@ -34,21 +30,17 @@ class Auth::RegisterService
     required_fields = %w[email password first_name last_name]
 
     required_fields.each do |field|
-      if @user_params[field].blank?
-        @errors << "#{field.humanize} is required"
-      end
+      add_error("#{field.humanize} is required") if @user_params[field].blank?
     end
 
-    if @user_params[:password].present? && @user_params[:password].length < 8
-      @errors << "Password must be at least 8 characters long"
-    end
-
-    if @user_params[:password] != @user_params[:password_confirmation]
-      @errors << "Password confirmation doesn't match password"
+    # Use base class password validation
+    if @user_params[:password].present?
+      valid_password?(@user_params[:password])
+      passwords_match?(@user_params[:password], @user_params[:password_confirmation])
     end
 
     if @user_params[:email].present? && User.exists?(email: @user_params[:email].downcase.strip)
-      @errors << "Email has already been taken"
+      add_error("Email has already been taken")
     end
 
     @errors.empty?

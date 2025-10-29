@@ -1,10 +1,8 @@
-class Auth::LoginService
-  attr_reader :user, :errors
-
+class Auth::LoginService < Auth::BaseService
   def initialize(email:, password:)
+    super()
     @email = email.to_s.downcase.strip
     @password = password.to_s
-    @errors = []
   end
 
   def call
@@ -15,20 +13,11 @@ class Auth::LoginService
     true
   end
 
-  def success?
-    @user.present? && @errors.empty?
-  end
-
   private
 
   def valid_params?
-    if @email.blank?
-      @errors << "Email is required"
-    end
-
-    if @password.blank?
-      @errors << "Password is required"
-    end
+    add_error("Email is required") if @email.blank?
+    add_error("Password is required") if @password.blank?
 
     @errors.empty?
   end
@@ -37,7 +26,7 @@ class Auth::LoginService
     @user = User.find_by(email: @email)
 
     unless @user&.authenticate(@password)
-      @errors << "Invalid email or password"
+      add_error("Invalid email or password")
       return false
     end
 
@@ -46,17 +35,17 @@ class Auth::LoginService
 
   def user_can_login?
     unless @user.active?
-      @errors << "Your account is not active. Please contact support."
+      add_error("Your account is not active. Please contact support.")
       return false
     end
 
     if @user.suspended?
-      @errors << "Your account has been suspended. Please contact support."
+      add_error("Your account has been suspended. Please contact support.")
       return false
     end
 
     unless @user.email_verified?
-      @errors << "Please verify your email address before logging in."
+      add_error("Please verify your email address before logging in.")
       return false
     end
 

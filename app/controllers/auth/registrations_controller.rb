@@ -29,10 +29,4 @@ class Auth::RegistrationsController < ApplicationController
       :phone_number
     )
   end
-
-  def redirect_if_authenticated
-    if user_signed_in?
-      redirect_to root_path
-    end
-  end
 end
