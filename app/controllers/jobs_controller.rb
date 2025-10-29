@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class JobsController < ApplicationController
+  include LiveSearchable
+  
   before_action :set_jobs_service
 
   def index
@@ -61,37 +63,10 @@ class JobsController < ApplicationController
   end
 
   def live_search
-    @query = params[:q]&.strip
-
-    if @query.present? && @query.length >= 2
-      # Use natural language search service for live search
-      search_service = NaturalLanguageSearchService.new(@query)
-      jobs = search_service.parse_and_search.limit(10)
-
-      @suggestions = jobs.includes(:company).map do |job|
-        {
-          id: job.id,
-          title: job.title,
-          company: job.company.name,
-          location: job.location,
-          employment_type: job.employment_type&.humanize,
-          url: job_path(job),
-          company_url: company_path(job.company)
-        }
-      end
-
-      # Add intelligent suggestions based on parsed query
-      @search_metadata = {
-        parsed_data: search_service.parsed_data,
-        suggestions_count: @suggestions.length
-      }
-    else
-      @suggestions = []
-      @search_metadata = {}
-    end
-
+    result = perform_live_search(jobs_scope: Job.published)
+    
     respond_to do |format|
-      format.json { render json: { suggestions: @suggestions, metadata: @search_metadata } }
+      format.json { render json: result }
     end
   end
 

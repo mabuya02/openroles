@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class RemoteJobsController < ApplicationController
+  include LiveSearchable
+  
   before_action :set_remote_jobs_service
 
   def index
@@ -61,38 +63,16 @@ class RemoteJobsController < ApplicationController
   end
 
   def live_search
-    @query = params[:q]&.strip
-
-    if @query.present? && @query.length >= 2
-      # Use natural language search service for live search on remote jobs
-      search_service = NaturalLanguageSearchService.new(@query)
-      jobs = search_service.parse_and_search.remote_friendly.limit(10)
-
-      @suggestions = jobs.includes(:company).map do |job|
-        {
-          id: job.id,
-          title: job.title,
-          company: job.company.name,
-          location: job.location,
-          employment_type: job.employment_type&.humanize,
-          url: job_path(job),
-          company_url: company_path(job.company),
-          salary: job.salary_range_display
-        }
-      end
-
-      # Add intelligent suggestions based on parsed query
-      @search_metadata = {
-        parsed_data: search_service.parsed_data,
-        suggestions_count: @suggestions.length
-      }
-    else
-      @suggestions = []
-      @search_metadata = {}
+    result = perform_live_search(jobs_scope: Job.remote_friendly.published)
+    
+    # Add salary info for remote jobs
+    result[:suggestions].each do |suggestion|
+      job = Job.find(suggestion[:id])
+      suggestion[:salary] = job.salary_range_display if job.respond_to?(:salary_range_display)
     end
-
+    
     respond_to do |format|
-      format.json { render json: { suggestions: @suggestions, metadata: @search_metadata } }
+      format.json { render json: result }
     end
   end
 

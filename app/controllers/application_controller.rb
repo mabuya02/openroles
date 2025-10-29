@@ -90,6 +90,12 @@ class ApplicationController < ActionController::Base
     controller_path.start_with?("auth/")
   end
 
+  def redirect_if_authenticated
+    if user_signed_in?
+      redirect_to root_path
+    end
+  end
+
   # Make these methods available in views
   helper_method :current_user, :user_signed_in?
 end

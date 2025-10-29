@@ -70,12 +70,6 @@ class Auth::SessionsController < ApplicationController
 
   private
 
-  def redirect_if_authenticated
-    if user_signed_in?
-      redirect_to after_sign_in_path
-    end
-  end
-
   def after_sign_in_path
     stored_location_for_user || root_path
   end
