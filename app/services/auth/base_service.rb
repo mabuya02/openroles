@@ -8,7 +8,7 @@ module Auth
 
     def initialize
       @errors = []
-      @user = nil
+      # Note: @user is expected to be set by subclasses
     end
 
     # Check if the service operation was successful
