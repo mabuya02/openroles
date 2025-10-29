@@ -1,11 +1,11 @@
-class Auth::VerificationService
-  attr_reader :user, :errors, :verification_code
+class Auth::VerificationService < Auth::BaseService
+  attr_reader :verification_code
 
   def initialize(code: nil, user: nil, code_type: "email_verification")
+    super()
     @code = code&.strip  # Remove upcase since we're using tokens now
     @user = user
     @code_type = code_type
-    @errors = []
   end
 
   def verify_code
@@ -20,7 +20,7 @@ class Auth::VerificationService
 
     true
   rescue ActiveRecord::RecordInvalid => e
-    @errors.concat(e.record.errors.full_messages)
+    add_errors(e.record.errors.full_messages)
     false
   end
 
@@ -34,20 +34,11 @@ class Auth::VerificationService
     true
   end
 
-  def success?
-    @errors.empty?
-  end
-
   private
 
   def valid_params?
-    if @code.blank?
-      @errors << "Verification link is invalid"
-    end
-
-    unless @user
-      @errors << "User is required"
-    end
+    add_error("Verification link is invalid") if @code.blank?
+    add_error("User is required") unless @user
 
     @errors.empty?
   end
@@ -60,7 +51,7 @@ class Auth::VerificationService
       .find_by(code: @code)
 
     unless @verification_code
-      @errors << "Invalid or expired verification code"
+      add_error("Invalid or expired verification code")
       return false
     end
 
@@ -69,12 +60,12 @@ class Auth::VerificationService
 
   def code_valid?
     if @verification_code.expired?
-      @errors << "Verification code has expired"
+      add_error("Verification code has expired")
       return false
     end
 
     if @verification_code.max_attempts_reached?
-      @errors << "Maximum verification attempts reached. Please request a new code."
+      add_error("Maximum verification attempts reached. Please request a new code.")
       return false
     end
 
@@ -106,24 +97,24 @@ class Auth::VerificationService
       .first
 
     if last_code && last_code.created_at > 1.minute.ago
-      @errors << "Please wait before requesting another verification code"
+      add_error("Please wait before requesting another verification code")
       return false
     end
 
     case @code_type
     when "email_verification"
       if @user.email_verified?
-        @errors << "Email is already verified"
+        add_error("Email is already verified")
         return false
       end
     when "phone_verification"
       if @user.phone_verified?
-        @errors << "Phone number is already verified"
+        add_error("Phone number is already verified")
         return false
       end
 
       unless @user.phone_number.present?
-        @errors << "Phone number is required for verification"
+        add_error("Phone number is required for verification")
         return false
       end
     end
