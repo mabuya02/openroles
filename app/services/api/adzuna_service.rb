@@ -45,18 +45,10 @@ module Api
       query_parts.join(" ")
     end
 
-    def remote_location?(loc)
-      return false unless loc.present?
 
-      remote_terms = %w[remote telecommute work\ from\ home anywhere wfh]
-      remote_terms.any? { |term| loc.downcase.include?(term.downcase) }
-    end
 
     # Override base class method to handle Adzuna's location hash format
     def extract_remote_policy(job_data)
-      return "remote" if job_data["remote"] == true
-      return "onsite" if job_data["remote"] == false
-
       # Handle Adzuna's location hash format
       location_display = if job_data["location"].is_a?(Hash)
         job_data["location"]["display_name"] || ""
@@ -64,20 +56,10 @@ module Api
         job_data["location"]&.to_s || ""
       end
 
-      location_text = location_display.downcase
-      description = job_data["description"]&.downcase || ""
-      title = job_data["title"]&.downcase || ""
-
-      # Check for remote indicators in location, title, or description
-      remote_terms = [ "remote", "anywhere", "work from home", "telecommute", "wfh" ]
-
-      if remote_terms.any? { |term| [ location_text, title, description ].any? { |field| field.include?(term) } }
-        "remote"
-      elsif location_text.include?("hybrid") || description.include?("hybrid")
-        "hybrid"
-      else
-        "onsite"
-      end
+      # Use shared method with formatted location
+      job_data_copy = job_data.dup
+      job_data_copy["location"] = location_display
+      extract_remote_policy_from_data(job_data_copy)
     end
 
     def parse_response(response)
@@ -147,19 +129,19 @@ module Api
     end
 
     def extract_contract_type(job_data)
-      contract_type = job_data["contract_type"]&.downcase
-
+      # Map Adzuna-specific contract types to standard employment types
+      contract_type = job_data["contract_type"]&.downcase || ""
+      
       case contract_type
       when "permanent"
         "full_time"
-      when "contract"
+      when "contract", "temporary"
         "contract"
       when "part_time"
         "part_time"
-      when "temporary"
-        "contract"
       else
-        "full_time"
+        # Use shared extraction method as fallback
+        extract_employment_type_from_text(job_data, fields: [ :title, :description ])
       end
     end
 
@@ -176,24 +158,9 @@ module Api
       # Add category as a tag
       tags << job_data["category"]["label"] if job_data["category"]
 
-      # Extract skills from description
-      description = job_data["description"]&.downcase || ""
-
-      # Programming languages and frameworks
-      tech_skills = %w[
-        ruby python java javascript typescript php go rust swift kotlin scala
-        rails django flask spring laravel symfony nodejs react angular vue
-        mysql postgresql mongodb redis elasticsearch solr
-        aws azure gcp heroku digitalocean
-        docker kubernetes terraform ansible
-        git github gitlab bitbucket jenkins circleci
-        html css sass scss bootstrap tailwind
-        rest soap graphql grpc websocket
-        linux ubuntu centos debian macos windows
-      ]
-
-      found_skills = tech_skills.select { |skill| description.include?(skill) }
-      tags.concat(found_skills)
+      # Extract tech skills from description using shared method
+      description = job_data["description"] || ""
+      tags.concat(extract_tech_skills(description))
 
       tags.compact.uniq
     end

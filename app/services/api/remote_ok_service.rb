@@ -89,70 +89,28 @@ module Api
     end
 
     def determine_employment_type(job_data)
-      position = job_data["position"]&.downcase || ""
-      tags = Array(job_data["tags"]).map(&:downcase)
-
-      return "contract" if tags.include?("contract") || position.include?("contract")
-      return "part_time" if tags.include?("part-time") || position.include?("part time")
-      return "internship" if tags.include?("intern") || position.include?("intern")
-
-      "full_time"
+      # Use shared extraction method
+      extract_employment_type_from_text(job_data, fields: [ :position, :tags ])
     end
 
     def extract_remoteok_tags(job_data)
       tags = Array(job_data["tags"]) || []
 
-      # Filter out common non-skill tags
-      excluded_tags = %w[
-        remote worldwide anywhere hiring open fulltime
-        parttime contract freelance visa new hot
-        top featured popular trending urgent
-      ]
+      # Filter out non-skill tags using shared method
+      skill_tags = filter_skill_tags(tags)
 
-      skill_tags = tags.reject do |tag|
-        excluded_tags.include?(tag.downcase) ||
-        tag.match?(/^\d+$/) || # Remove numeric tags
-        tag.length < 2 # Remove very short tags
-      end
-
-      # Add normalized tech tags
-      normalized_tags = skill_tags.map do |tag|
-        normalize_tech_tag(tag.downcase)
-      end.compact.uniq
-
-      normalized_tags
+      # Normalize tech tags using shared method
+      skill_tags.map { |tag| normalize_tech_tag(tag) }.uniq
     end
 
-    def normalize_tech_tag(tag)
-      # Normalize common variations
-      tag_mapping = {
-        "js" => "javascript",
-        "ts" => "typescript",
-        "py" => "python",
-        "rb" => "ruby",
-        "go" => "golang",
-        "k8s" => "kubernetes",
-        "tf" => "terraform",
-        "pg" => "postgresql",
-        "mongo" => "mongodb",
-        "redis" => "redis",
-        "aws" => "aws",
-        "gcp" => "gcp",
-        "azure" => "azure"
-      }
 
-      tag_mapping[tag] || tag
-    end
 
     def extract_experience_from_tags(tags)
       return "mid" unless tags.is_a?(Array)
 
-      tags_str = tags.join(" ").downcase
-
-      return "senior" if tags_str.match?(/senior|lead|principal|staff|expert|architect/)
-      return "junior" if tags_str.match?(/junior|entry|graduate|intern|beginner/)
-
-      "mid"
+      # Use shared experience extraction method
+      tags_text = tags.join(" ")
+      extract_experience_level(tags_text)
     end
   end
 end

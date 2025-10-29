@@ -4,6 +4,7 @@ module Api
   # Base class for external API integrations
   class BaseApiService
     include ActiveModel::Validations
+    include Api::Concerns::JobDataExtraction
 
     def initialize(keywords = nil, location = nil, limit = 50)
       @keywords = keywords

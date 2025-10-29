@@ -92,6 +92,7 @@ module Api
     def extract_job_type(job_data)
       job_type = job_data["job_type"]&.downcase || ""
 
+      # Handle Remotive-specific format first
       case job_type
       when "full_time", "full-time"
         "full_time"
@@ -100,7 +101,8 @@ module Api
       when "contract", "contractor", "freelance"
         "contract"
       else
-        "full_time"
+        # Use shared extraction method as fallback
+        extract_employment_type_from_text(job_data, fields: [ :title, :description ])
       end
     end
 
@@ -108,46 +110,19 @@ module Api
       salary_str = job_data["salary"]
       return nil unless salary_str.present?
 
-      # Handle salary ranges like "$90 - $150 /hour", "€55k - €80k", "$10k"
-      if salary_str.match?(/(\d+(?:k)?)\s*-\s*(\d+(?:k)?)/i)
-        # Range format
-        min_match = salary_str.match(/(\d+(?:k)?)/i)
-        return parse_salary_amount(min_match[1]) if min_match
-      elsif salary_str.match?(/(\d+(?:k)?)/i)
-        # Single amount - use as minimum
-        amount_match = salary_str.match(/(\d+(?:k)?)/i)
-        return parse_salary_amount(amount_match[1]) if amount_match
-      end
-
-      nil
+      # Use shared salary extraction method
+      extract_salary_from_text(salary_str, type: :min)
     end
 
     def extract_salary_max(job_data)
       salary_str = job_data["salary"]
       return nil unless salary_str.present?
 
-      # Handle salary ranges like "$90 - $150 /hour", "€55k - €80k"
-      if salary_str.match?(/(\d+(?:k)?)\s*-\s*(\d+(?:k)?)/i)
-        # Range format - get the second number
-        range_match = salary_str.match(/\d+(?:k)?\s*-\s*(\d+(?:k)?)/i)
-        return parse_salary_amount(range_match[1]) if range_match
-      end
-
-      nil
+      # Use shared salary extraction method
+      extract_salary_from_text(salary_str, type: :max)
     end
 
-    def parse_salary_amount(amount_str)
-      return nil unless amount_str.present?
 
-      # Remove any non-digit/k characters and convert
-      clean_amount = amount_str.gsub(/[^\dk]/i, "")
-
-      if clean_amount.downcase.end_with?("k")
-        clean_amount.to_i * 1000
-      else
-        clean_amount.to_i
-      end
-    end
 
     def extract_salary(job_data, type)
       # Legacy method - keeping for compatibility
@@ -165,39 +140,17 @@ module Api
       # Add category as tag
       tags << job_data["category"] if job_data["category"]
 
-      # Extract tags from job title and description
-      content = "#{job_data['title']} #{job_data['description']}".downcase
-
-      # Tech stack detection
-      tech_stack = %w[
-        ruby rails python django javascript node react vue angular
-        php laravel java spring kotlin swift ios android
-        golang rust scala elixir clojure haskell
-        postgresql mysql mongodb redis elasticsearch
-        aws azure gcp docker kubernetes terraform
-        git github gitlab jenkins circleci travis
-        typescript html css sass bootstrap tailwind
-        graphql rest api microservices serverless
-        linux ubuntu debian centos macos
-        agile scrum kanban devops ci/cd
-      ]
-
-      found_tech = tech_stack.select { |tech| content.include?(tech) }
-      tags.concat(found_tech)
+      # Extract tech skills from job title and description using shared method
+      content = "#{job_data['title']} #{job_data['description']}"
+      tags.concat(extract_tech_skills(content))
 
       tags.compact.uniq.map(&:downcase)
     end
 
     def extract_experience_level(job_data)
-      title = job_data["title"]&.downcase || ""
-      description = job_data["description"]&.downcase || ""
-      content = "#{title} #{description}"
-
-      return "senior" if content.match?(/senior|lead|principal|staff|architect/)
-      return "mid" if content.match?(/mid|intermediate|experienced/)
-      return "junior" if content.match?(/junior|entry|graduate|intern/)
-
-      "mid" # Default
+      # Use shared experience extraction method
+      content = "#{job_data['title']} #{job_data['description']}"
+      super(content)
     end
   end
 end
