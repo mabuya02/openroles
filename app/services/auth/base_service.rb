@@ -2,13 +2,24 @@
 
 module Auth
   # Base service class for authentication-related services
-  # Provides common structure and methods for error handling
+  # 
+  # Provides common structure and methods for error handling.
+  # Subclasses should set @user during their operation (typically in the call method)
+  # when the user is successfully found/created/authenticated.
+  #
+  # @example
+  #   class Auth::LoginService < Auth::BaseService
+  #     def call
+  #       @user = User.find_by(email: @email)
+  #       # ... validation logic ...
+  #     end
+  #   end
   class BaseService
     attr_reader :errors, :user
 
     def initialize
       @errors = []
-      # Note: @user is expected to be set by subclasses
+      # @user is set by subclasses during their operation
     end
 
     # Check if the service operation was successful
